@@ -109,7 +109,8 @@ S3_PREFIX  = "MGCLS_HI/Datasets/koketso-HI-MGCLS-data/HI-MGCLS/"
 
 S3_HTTP_BASE = f"https://{S3_BUCKET}.s3.{S3_REGION}.amazonaws.com/{S3_PREFIX.rstrip('/')}"
 
-S3_CLUSTER_CATALOGUE_KEY  = f"{S3_PREFIX}Cluster_catalogue/MGCLS_HI.txt"
+S3_CLUSTER_CATALOGUE_KEY_OLD  = f"{S3_PREFIX}Cluster_catalogue/MGCLS_HI.txt"
+S3_CLUSTER_CATALOGUE_KEY      = f"{S3_PREFIX}Cluster_catalogue/MGCLS_HI_Final.txt"
 S3_CATALOGUES_PREFIX      = f"{S3_PREFIX}Catalogues/"
 S3_CLUSTER_FIGURES_PREFIX = f"{S3_PREFIX}Cluster-Figures/"
 S3_GALAXY_FIGURES_PREFIX  = f"{S3_PREFIX}Galaxy-Figures/"
@@ -119,6 +120,74 @@ S3_CLUSTER_MOMS_PREFIX    = f"{S3_PREFIX}Cluster-Moms/"
 S3_GALAXY_CUBELETS_PREFIX = f"{S3_PREFIX}Galaxy-Cubelets/"
 
 C_LIGHT = 299792.458  # km/s
+
+
+# ---- Combined metadata file helpers -----------------------------------------
+# MGCLS_HI_Final.txt contains:
+#   (1) a cluster-level master catalogue at the top; and
+#   (2) per-cluster SoFiA catalogues appended below, each preceded by '#<ClusterID>'.
+
+@lru_cache(maxsize=1)
+def _load_combined_metadata_text() -> str:
+    """Fetch MGCLS_HI_Final.txt (single source of truth for metadata).
+
+    If the environment variable MGCLS_HI_METADATA_PATH is set and points to a readable file,
+    load metadata from that local path (useful for local dev/testing).
+    """
+    local_path = os.environ.get("MGCLS_HI_METADATA_PATH")
+    if local_path:
+        try:
+            p = Path(local_path)
+            if p.exists() and p.is_file():
+                return p.read_text(encoding="utf-8", errors="replace")
+        except Exception:
+            # fall back to S3
+            pass
+    return _s3_get_text(S3_BUCKET, S3_REGION, S3_CLUSTER_CATALOGUE_KEY)
+
+
+@lru_cache(maxsize=1)
+def _split_combined_metadata() -> Tuple[str, Dict[str, str]]:
+    """
+    Split MGCLS_HI_Final.txt into:
+      - cluster_master_text: the top master cluster table
+      - sofia_blocks: dict mapping cluster id -> that cluster's SoFiA ASCII catalogue text
+    """
+    txt = _load_combined_metadata_text().replace("\r\n", "\n").replace("\r", "\n")
+    lines = txt.split("\n")
+
+    # Find first marker line of the form '#Abell-133' etc.
+    first_marker_idx = None
+    for i, ln in enumerate(lines):
+        s = ln.strip()
+        if s.startswith("#") and len(s) > 1 and not s.startswith("# "):
+            first_marker_idx = i
+            break
+
+    if first_marker_idx is None:
+        # No appended SoFiA blocks found; treat whole file as master catalogue.
+        return txt, {}
+
+    master_lines = lines[:first_marker_idx]
+    blocks_lines = lines[first_marker_idx:]
+
+    sofia_blocks: Dict[str, List[str]] = {}
+    current_key: Optional[str] = None
+
+    for ln in blocks_lines:
+        s = ln.strip()
+        if s.startswith("#") and len(s) > 1 and not s.startswith("# "):
+            current_key = s[1:].strip()
+            sofia_blocks[current_key] = [ln]
+            continue
+        if current_key is None:
+            # skip any padding/separator lines before the first marker
+            continue
+        sofia_blocks[current_key].append(ln)
+
+    sofia_blocks_text = {k: "\n".join(v).strip() for k, v in sofia_blocks.items()}
+    master_text = "\n".join(master_lines).strip()
+    return master_text, sofia_blocks_text
 
 # ---- Landing table (Home) display order, labels, and units ----
 # Keep "ID" first so the first cell still links to the cluster detail page.
@@ -396,8 +465,9 @@ def _parse_master_catalogue_text(txt: str) -> pd.DataFrame:
 
 @lru_cache(maxsize=2)
 def load_master_catalogue() -> pd.DataFrame:
-    txt = _s3_get_text(S3_BUCKET, S3_REGION, S3_CLUSTER_CATALOGUE_KEY)
-    return _parse_master_catalogue_text(txt)
+    # Read the combined metadata file and parse only the top (cluster-level) section.
+    master_txt, _ = _split_combined_metadata()
+    return _parse_master_catalogue_text(master_txt)
 
 
 @lru_cache(maxsize=1)
@@ -758,6 +828,67 @@ def _try_parse_sofia_ascii(text: str) -> Optional[pd.DataFrame]:
     return df
 
 
+def _try_parse_sofia_names_units(txt: str) -> Optional[pd.DataFrame]:
+    """
+    Parse a SoFiA-style ASCII catalogue where:
+      - first non-marker line is a column-name header (fixed-width, 2+ spaces between cols)
+      - second line is a units row
+      - data rows follow, and the first column may be a quoted string (e.g. source name)
+
+    This is tolerant of quoted names and does not rely on commas/tabs.
+    """
+    lines = [ln for ln in txt.replace("\r\n","\n").replace("\r","\n").split("\n") if ln.strip()]
+
+    # Drop marker lines like '#Abell-168' (but keep other content)
+    lines = [ln for ln in lines if not (ln.strip().startswith("#") and not ln.strip().startswith("# "))]
+    if len(lines) < 3:
+        return None
+
+    header = lines[0].rstrip("\n")
+
+    # Heuristic: header has many columns separated by 2+ spaces
+    cols = [c.strip() for c in re.split(r"\s{2,}", header.strip()) if c.strip()]
+    if len(cols) < 8:
+        return None
+
+    # De-duplicate column names
+    seen: Dict[str, int] = {}
+    col_names: List[str] = []
+    for c in cols:
+        n = seen.get(c, 0) + 1
+        seen[c] = n
+        col_names.append(c if n == 1 else f"{c}_{n}")
+
+    data_lines = lines[2:]
+    rows: List[List[str]] = []
+    for ln in data_lines:
+        s = ln.rstrip()
+        if not s:
+            continue
+
+        tokens: List[str] = []
+        if s.lstrip().startswith('"'):
+            m = re.match(r'^\s*"([^"]*)"\s*(.*)$', s)
+            if not m:
+                continue
+            tokens.append(m.group(1))
+            rest = m.group(2).strip()
+            if rest:
+                tokens.extend(re.split(r"\s+", rest))
+        else:
+            tokens = re.split(r"\s+", s.strip())
+
+        if len(tokens) < len(col_names):
+            tokens = tokens + [""] * (len(col_names) - len(tokens))
+        elif len(tokens) > len(col_names):
+            tokens = tokens[:len(col_names)]
+        rows.append(tokens)
+
+    if not rows:
+        return None
+
+    return pd.DataFrame(rows, columns=[c.strip().lower() for c in col_names])
+
 def _parse_sofia_flexible(txt: str) -> pd.DataFrame:
     """
     Generic parser: skip '#'-comments and try comma, tab, whitespace.
@@ -797,30 +928,48 @@ def load_sofia_catalogue(cluster_name: str) -> pd.DataFrame:
     if not cluster_clean:
         return pd.DataFrame()
 
-    # Try each variant until one loads
+    # Try to load embedded SoFiA catalogue blocks from the combined metadata file first.
     last_err: Optional[Exception] = None
     txt: Optional[str] = None
     which_key: Optional[str] = None
-    for v in _cluster_name_variants(cluster_clean):
-        key = f"{S3_CATALOGUES_PREFIX}{v}_cat.txt"
-        url = s3_http_url(S3_BUCKET, S3_REGION, key)
-        try:
-            txt = _http_get_text(url)
-            which_key = key
-            break
-        except Exception as e:
-            last_err = e
-            continue
 
+    try:
+        _, sofia_blocks = _split_combined_metadata()
+    except Exception as e:
+        sofia_blocks = {}
+        last_err = e
+
+    for v in _cluster_name_variants(cluster_clean):
+        if v in sofia_blocks:
+            txt = sofia_blocks[v]
+            which_key = f"embedded:{v}"
+            break
+
+    # Fallback: older layout with per-cluster SoFiA catalogues living under Catalogues/
+    if txt is None:
+        for v in _cluster_name_variants(cluster_clean):
+            key = f"{S3_CATALOGUES_PREFIX}{v}_cat.txt"
+            url = s3_http_url(S3_BUCKET, S3_REGION, key)
+            try:
+                txt = _http_get_text(url)
+                which_key = key
+                break
+            except Exception as e:
+                last_err = e
+                continue
     if txt is None:
         raise RuntimeError(f'Could not load SoFiA catalogue for "{cluster_clean}": {last_err}')
 
-    # Parse: ASCII header first, then flexible
+    # Parse: try known SoFiA ASCII variants first, then fall back to flexible parsing.
     df_ascii = _try_parse_sofia_ascii(txt)
     if df_ascii is not None:
         df = df_ascii
     else:
-        df = _parse_sofia_flexible(txt)
+        df_compact = _try_parse_sofia_names_units(txt)
+        if df_compact is not None:
+            df = df_compact
+        else:
+            df = _parse_sofia_flexible(txt)
 
     # Normalize column names (lower/strip)
     df = df.copy()
@@ -834,9 +983,9 @@ def load_sofia_catalogue(cluster_name: str) -> pd.DataFrame:
 
     col_id   = pick("id")
     col_name = pick("name", "mktcs name", "mktcs-hi name", "source name", "object name", "src_name")
-    col_ra   = pick("ra", "ra deg", "ra (j2000)", "ra[deg]", "ra deg (j2000)", "ra hms", "ra(hms)")
-    col_dec  = pick("dec", "dec deg", "dec (j2000)", "dec[deg]", "decl", "dec hms")
-    col_v    = pick("v_rad", "vrad", "v", "velocity", "v[km/s]", "radial velocity", "v_cen", "vhel")
+    col_ra   = pick("ra", "ra deg", "ra (j2000)", "ra[deg]", "ra deg (j2000)", "ra hms", "ra(hms)", "ra_peak")
+    col_dec  = pick("dec", "dec deg", "dec (j2000)", "dec[deg]", "decl", "dec hms", "dec_peak")
+    col_v    = pick("v_rad", "vrad", "v", "velocity", "v[km/s]", "radial velocity", "v_cen", "v_rad_peak", "v_peak", "vhel")
     col_f    = pick("f_sum", "sint", "s int", "integrated flux", "flux", "fint", "s_int")
     col_w20  = pick("w20", "w 20", "w20[km/s]", "w_20", "w_20[km/s]")
     col_w50  = pick("w50", "w 50", "w50[km/s]", "w_50", "w_50[km/s]")
