@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>{% block title %}MGCLS–H I{% endblock %}</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous">
+
+  <!-- Bootstrap Icons (for social icons) -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    rel="stylesheet">
+
+  {# Navbar & figure bases #}
+  {% set NAVBAR_IMG = NAVBAR_IMG
+    or "https://ratt-public-data.s3.af-south-1.amazonaws.com/MGCLS_HI/Datasets/koketso-HI-MGCLS-data/HI-MGCLS/navbar_figures/navbar_image.png" %}
+  {% set LOGO_IMG = LOGO_IMG
+    or "https://ratt-public-data.s3.af-south-1.amazonaws.com/MGCLS_HI/Datasets/koketso-HI-MGCLS-data/HI-MGCLS/navbar_figures/logo.png" %}
+
+  {% set CLUSTER_FIG_BASE = "https://ratt-public-data.s3.af-south-1.amazonaws.com/MGCLS_HI/Datasets/koketso-HI-MGCLS-data/HI-MGCLS/Cluster-Figures" %}
+  {% set FOOTER_BASE = "https://ratt-public-data.s3.af-south-1.amazonaws.com/MGCLS_HI/Datasets/koketso-HI-MGCLS-data/HI-MGCLS/FooterFigures" %}
+
+  <style>
+    /* Layout to keep footer at the very bottom */
+    html, body { height: 100%; }
+    body { display: flex; flex-direction: column; }
+    main { flex: 1 0 auto; }
+
+    /* Navbar background with dark gradient overlay for legibility */
+    .navbar-hero {
+      background-color: #0b1220;
+      background-image:
+        linear-gradient(rgba(10,10,15,0.72), rgba(10,10,15,0.72)),
+        url("{{ NAVBAR_IMG }}");
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      min-height: 72px;
+    }
+
+    .navbar-hero .navbar-nav .nav-link,
+    .navbar-hero .navbar-brand,
+    .navbar-hero .navbar-toggler {
+      color: #f8f9fa !important;
+    }
+
+    .navbar .nav-link.active {
+      position: relative;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+    .navbar .nav-link.active::after {
+      content: "";
+      position: absolute;
+      left: 0.5rem;
+      right: 0.5rem;
+      bottom: -0.25rem;
+      height: 2px;
+      background: #ffffff;
+      border-radius: 2px;
+      opacity: 0.9;
+    }
+
+    .brand-logo {
+      height: 36px;
+      width: auto;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    .brand-text {
+      font-weight: 600;
+      letter-spacing: .2px;
+    }
+
+    main > .container {
+      padding-top: 1.25rem;
+      padding-bottom: 2rem;
+    }
+
+    /* ---------------- SCIENCE HERO (landing block under navbar) ---------------- */
+
+    main .science-hero {
+      position: relative;
+      padding-top: 1.5rem;
+      padding-bottom: 1.5rem;
+      background-image: url("https://ratt-public-data.s3.af-south-1.amazonaws.com/MGCLS_HI/Datasets/koketso-HI-MGCLS-data/HI-MGCLS/OtherFigures/noise_background.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+
+      /* Slightly smaller than rest of <main> so cards don’t feel over-full */
+      font-size: 1.8rem;
+      line-height: 1.6;
+    }
+
+    /* Cards in the science hero: transparent “glass” with white text */
+    .science-hero .bg-white {
+      background-color: transparent !important;             /* no fill */
+      border: 2px solid rgba(255, 255, 255, 0.9);          /* bright border */
+      box-shadow: 0 0 16px rgba(255, 255, 255, 0.35);      /* outer white-ish glow */
+      color: #ffffff;
+    }
+
+    /* Make all text inside the hero cards white with a dark edge for legibility */
+    .science-hero .bg-white * {
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);           /* dark halo */
+      -webkit-text-stroke: 0.2px #000000;                  /* subtle black text border (Chrome/Safari) */
+    }
+
+    /* Allow inline colours (e.g. purple heading) to still stand out */
+    .science-hero h1[style] {
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Links inside hero */
+    .science-hero a {
+      color: #8ab4ff;
+    }
+    .science-hero a:hover {
+      color: #c3d9ff;
+    }
+
+    /* Right-hand title (MGCLS–H I at a Glance) */
+    .science-hero .hi-glance-title {
+      font-size: 2.1rem;
+      font-weight: 700;
+      text-align: center;
+      color: #4a148c;
+    }
+    @media (max-width: 575.98px) {
+      .science-hero .hi-glance-title {
+        font-size: 1.4rem;
+      }
+    }
+
+    /* Available data products text tweaks */
+    main .data-products-intro {
+      font-size: 0.95em;
+    }
+    main .data-products-list li {
+      font-size: 0.9em;
+      font-weight: 400; /* normal weight, not bold */
+    }
+
+    /* ---------------- MAIN CONTENT TYPOGRAPHY ---------------- */
+
+    /* Make body content significantly larger than footer (≈2×) */
+    main {
+      font-size: 1.7rem;   /* base for page content */
+      line-height: 1.6;
+    }
+
+    /* Headings inside main content */
+    main h1 {
+      font-size: 2.4rem;
+      font-weight: 600;
+      margin-bottom: 0.9em;
+    }
+    main h2 {
+      font-size: 2.1rem;
+      font-weight: 600;
+      margin-bottom: 0.8em;
+    }
+    main h3 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 0.7em;
+    }
+    main h4,
+    main h5,
+    main h6 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.6em;
+    }
+
+    /* Paragraphs & lists use main's base font-size */
+    main p,
+    main li {
+      font-size: 1em;
+    }
+
+    /* Forms */
+    main .form-label,
+    main label {
+      font-size: 0.95em;
+    }
+
+    main .form-control,
+    main .form-select,
+    main .form-check-label {
+      font-size: 0.95em;
+    }
+
+    /* Tables */
+    main table {
+      font-size: 0.9em;
+    }
+
+    /* Small text inside main (notes, hints) */
+    main small,
+    main .small {
+      font-size: 0.75em;
+    }
+
+    /* Buttons in main content */
+    main .btn {
+      font-size: 0.9em;
+      padding: 0.45em 0.9em;
+    }
+
+    /* Stretch any inner Bootstrap .container on content pages
+       (people, about, publications, help, etc.) */
+    main .container {
+      max-width: 100%;
+    }
+
+    /* ---------------- FOOTER ---------------- */
+    .site-footer {
+      background: #d0d0d0;
+      color: #212529;
+      margin-top: auto;
+      font-size: calc(1rem * var(--footer-scale));
+    }
+    .site-footer a { color: #0d6efd; text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
+
+    :root {
+      --footer-logo-size: 192px; /* keep logos big */
+      --footer-scale: 1;         /* footer text baseline */
+    }
+    .footer-logo {
+      width: var(--footer-logo-size);
+      height: auto;
+      opacity: 0.95;
+      filter: grayscale(8%);
+      transition: transform .15s ease, filter .15s ease, opacity .15s ease;
+    }
+    .footer-logo:hover {
+      opacity: 1;
+      filter: none;
+      transform: translateY(-2px);
+    }
+
+    /* INDIVIDUAL LOGO OVERRIDES (tune sizes here) */
+    .footer-logo-ratt  { width: 200px; }
+    .footer-logo-sarao { width: 200px; }
+    .footer-logo-ru    { width: 210px; }
+    .footer-logo-mgcls { width: 200px; }
+    .footer-logo-sofia { width: 180px; }
+    .footer-logo-aws   { width: 250px; }
+
+    /* Push supporter logos slightly to the right */
+    .supported-logos {
+      padding-left: 2.5rem;
+    }
+
+    .social-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: calc(40px * var(--footer-scale));
+      height: calc(40px * var(--footer-scale));
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,.28);
+      margin-right: 8px;
+      font-size: calc(18px * var(--footer-scale));
+    }
+
+    .site-footer address {
+      font-style: normal;
+      line-height: 1.45;
+    }
+    .site-footer hr {
+      border-color: rgba(0,0,0,.25);
+      opacity: 1;
+    }
+
+    /* Footer text sizes */
+    .site-footer h6 {
+      font-size: calc(1.1rem * var(--footer-scale));
+    }
+    .site-footer .small,
+    .site-footer address,
+    .site-footer a,
+    .site-footer .btn {
+      font-size: calc(0.875rem * var(--footer-scale));
+    }
+    .site-footer .btn {
+      padding: calc(0.375rem * var(--footer-scale))
+               calc(0.75rem * var(--footer-scale));
+    }
+
+    /* NEW STRETCH MARGINS CODE WORK */
+    @media (min-width: 1400px) {
+      .container-xxl { max-width: 1700px; }
+    }
+    @media (min-width: 1800px) {
+      .container-xxl { max-width: 95vw; }
+    }
+
+    @media (min-width: 992px) {
+      .table-responsive { overflow-x: visible; }
+    }
+
+    .data-table th,
+    .data-table td { white-space: nowrap; }
+
+    .preview-strip,
+    .preview-row {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: nowrap;
+    }
+    @media (min-width: 1200px) {
+      .preview-strip,
+      .preview-row { overflow-x: visible; }
+    }
+
+    main > .container-fluid { max-width: 98vw; }
+
+    .table-responsive { overflow-x: auto; }
+
+    .accordion-button {
+      font-size: 1.4rem;
+    }
+    
+    .accordion-body {
+      font-size: 1.25rem;
+      line-height: 1.6;
+    }
+    
+    .placeholder-glow {
+      opacity: 0.7;
+      font-style: italic;
+      margin: 0.5rem 0;
+    }
+    
+
+  </style>
+
+  <style>
+    /* Navbar matches page wrapper exactly */
+    .navbar-hero { --bs-navbar-padding-x: 0; padding-left: 0; padding-right: 0; }
+    .navbar-hero .wide-wrap { max-width: 1400px; margin-inline: auto; width: 100%; }
+    @media (min-width: 1800px) { .navbar-hero .wide-wrap { max-width: 95vw; } }
+    .navbar-hero .navbar-brand { margin-left: 0; }
+  </style>
+
+  <style>
+    /* -------- TWICE LIGHT / TWICE BIGGER NAV OVERRIDES -------- */
+    body.bg-light { background-color: #fcfdff !important; }
+
+    :root{
+      --nav-overlay-a: .06;
+      --nav-min-h: 224px;
+      --nav-logo-h: 116px;
+      --nav-link-size: 2.00rem;
+      --nav-link-py: 1.75rem;
+    }
+
+    .navbar-hero{
+      min-height: var(--nav-min-h);
+      background-image:
+        linear-gradient(rgba(17,12,40,var(--nav-overlay-a)),
+                        rgba(17,12,40,var(--nav-overlay-a))),
+        url("{{ NAVBAR_IMG }}");
+    }
+    .brand-logo{ height: var(--nav-logo-h); width:auto; }
+    .navbar-hero .nav-link{
+      font-size: var(--nav-link-size);
+      padding-top: var(--nav-link-py);
+      padding-bottom: var(--nav-link-py);
+    }
+    .navbar .nav-link.active::after{
+      bottom: -0.7rem;
+      height: 4px;
+    }
+    .navbar-toggler{ transform: scale(1.35); }
+
+    @media (max-width: 575.98px){
+      :root{
+        --nav-min-h: 128px;
+        --nav-logo-h: 64px;
+        --nav-link-size: 1.15rem;
+        --nav-link-py: .9rem;
+        --nav-overlay-a: .10;
+      }
+    }
+  </style>
+
+</head>
+<body class="bg-light">
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-hero sticky-top shadow-sm">
+  <div class="wide-wrap d-flex align-items-center px-4">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}">
+      <img src="{{ LOGO_IMG }}" alt="MGCLS–H I Logo" class="brand-logo">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+            aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto">
+
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if request.endpoint == 'index' else '' }}"
+             href="{{ url_for('index') }}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if request.endpoint == 'search' else '' }}"
+             href="{{ url_for('search') }}">Search</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if request.endpoint == 'people' else '' }}"
+             href="{{ url_for('people') }}">People</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if request.endpoint == 'about' else '' }}"
+             href="{{ url_for('about') }}">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if request.endpoint == 'publications' else '' }}"
+             href="{{ url_for('publications') }}">Publications</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if request.endpoint == 'help' else '' }}"
+             href="{{ url_for('help') }}">Help</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE CONTENT -->
+<main>
+  <div class="container-fluid wide-wrap mt-4 px-4">
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container-fluid wide-wrap py-4">
+    <div class="row g-4">
+
+      <!-- Left: Supporting institutions -->
+      <div class="col-12 col-lg-4">
+        <h6 class="text-uppercase fw-semibold mb-3">Supported by</h6>
+
+        <div class="mb-3 d-flex gap-3 flex-wrap supported-logos">
+          <!-- Row 1 -->
+          <a href="https://ratt.center/" target="_blank" rel="noopener">
+            <img class="footer-logo footer-logo-ratt"
+                 src="{{ FOOTER_BASE }}/ratt-logo.png" alt="RATT">
+          </a>
+          <a href="https://www.sarao.ac.za/" target="_blank" rel="noopener">
+            <img class="footer-logo footer-logo-sarao"
+                 src="{{ FOOTER_BASE }}/sarao.png" alt="SARAO">
+          </a>
+        </div>
+        <div class="mb-3 d-flex gap-3 flex-wrap supported-logos">
+          <!-- Row 2 -->
+          <a href="https://www.ru.ac.za/" target="_blank" rel="noopener">
+            <img class="footer-logo footer-logo-ru"
+                 src="{{ FOOTER_BASE }}/ru_logo.png" alt="Rhodes University">
+          </a>
+          <a href="https://mgcls.sarao.ac.za/" target="_blank" rel="noopener">
+            <img class="footer-logo footer-logo-mgcls"
+                 src="{{ FOOTER_BASE }}/mgcls-logo.png" alt="MGCLS">
+          </a>          
+        </div>
+
+        <div class="mb-2 d-flex gap-3 flex-wrap supported-logos">
+          <!-- Row 3 -->
+          <a href="https://gitlab.com/SoFiA-Admin/SoFiA-2" target="_blank" rel="noopener">
+            <img class="footer-logo footer-logo-sofia"
+                 src="{{ FOOTER_BASE }}/SoFiA-2.png" alt="SoFiA-2">
+          </a>
+          <a href="https://aws.amazon.com/s3/" target="_blank" rel="noopener">
+            <img class="footer-logo footer-logo-aws"
+                 src="{{ FOOTER_BASE }}/aws-s3-logo.png" alt="AWS S3">
+          </a>          
+        </div>
+      </div>
+
+      <!-- Middle: RATT socials + blurb -->
+      <div class="col-12 col-lg-4">
+        <h6 class="text-uppercase fw-semibold mb-3">RATT Socials</h6>
+        <div class="d-flex align-items-center flex-wrap">
+          <a class="social-icon mb-2" href="https://www.linkedin.com/company/rattiverse" target="_blank" rel="noopener" aria-label="LinkedIn">
+            <i class="bi bi-linkedin"></i>
+          </a>
+          <a class="social-icon mb-2" href="https://x.com/RATTiverse?t=zmgu3C-_hBu96JIu4JYRKg&s=08" target="_blank" rel="noopener" aria-label="X">
+            <i class="bi bi-twitter-x"></i>
+          </a>
+          <a class="social-icon mb-2" href="https://www.instagram.com/ratt.center?igsh=eWtsMWp0eWtzeXd0" target="_blank" rel="noopener" aria-label="Instagram">
+            <i class="bi bi-instagram"></i>
+          </a>
+          <a class="social-icon mb-2" href="https://www.youtube.com/channel/UCyLZj6ZcAFy1dilChC98ZUw" target="_blank" rel="noopener" aria-label="YouTube">
+            <i class="bi bi-youtube"></i>
+          </a>
+          <a class="social-icon mb-2" href="https://ratt.center/" target="_blank" rel="noopener" aria-label="Website">
+            <i class="bi bi-globe2"></i>
+          </a>
+          <a class="social-icon mb-2" href="https://github.com/ratt-ru" target="_blank" rel="noopener" aria-label="GitHub (org)">
+            <i class="bi bi-github"></i>
+          </a>
+        </div>
+
+        <p class="mt-3 mb-1 small">
+          The MGCLS–H&nbsp;I database provides free, open access to H&nbsp;I galaxy cluster data and
+          multi-wavelength preview figures from the MeerKAT Galaxy Cluster Legacy Survey.
+        </p>
+        <p class="mb-0 small">
+          Our serverless, static front-end is hosted on AWS S3 and supported by SARAO, the MGCLS team,
+          RATT, Rhodes University, AWS and the SoFiA-2 community — you only use bandwidth and compute
+          when you browse or download data products.
+        </p>
+      </div>
+
+      <!-- Right: Contact & dual addresses/maps -->
+      <div class="col-12 col-lg-4">
+        <h6 class="text-uppercase fw-semibold mb-3">Contact Us</h6>
+
+        <div class="d-flex flex-wrap gap-2 mb-2">
+          <a class="btn btn-outline-light"
+             href="mailto:admin@ratt.center?subject=MGCLS-HI%20Admin%20Support">
+            <span class="me-2">RATT Admin</span>
+            <i class="bi bi-envelope-fill"></i>
+          </a>          
+          <a class="btn btn-warning"
+             href="mailto:kmophahlane@gmail.com,jamesdastro@gmail.com,m.ramatsoku@ru.ac.za,kamau757@gmail.com?subject=MGCLS-HI%20Database%20Query">
+            <span class="me-2">MGCLS-HI Team</span>
+            <i class="bi bi-envelope-fill"></i>
+          </a>
+        </div>
+
+        <div class="mb-2"
+             style="font-family: Arial, sans-serif; font-size: 1.1em; color: #6a1b9a;">
+          <a href="tel:+27466037679"
+             class="me-3 d-inline-flex align-items-center"
+             aria-label="Call RATT Admin">
+            <i class="bi bi-telephone-fill me-1"></i>
+            <span>RATT Admin</span>
+          </a>
+          <a href="tel:+2771557686"
+             class="me-3 d-inline-flex align-items-center"
+             aria-label="Call MGCLS-HI Team">
+            <i class="bi bi-telephone-fill me-1"></i>
+            <span>MGCLS-HI Team</span>
+          </a>
+          <a href="https://wa.me/2771557686"
+             target="_blank"
+             rel="noopener"
+             class="d-inline-flex align-items-center"
+             aria-label="WhatsApp">
+            <i class="bi bi-whatsapp me-1"></i>
+            <span>MGCLS-HI Team</span>
+          </a>
+        </div>
+
+        <div class="row gy-3">
+          <!-- RATT address + map -->
+          <div class="col-12 col-md-6">
+            <h6 class="fw-semibold mb-1">Rhodes University RATT</h6>
+            <address class="mb-2 small">
+              Centre for Radio Astronomy Techniques &amp; Technologies<br>
+              Department of Physics and Electronics<br>
+              Rhodes University<br>
+              Artillery Road, Grahamstown, 6140
+            </address>
+            <iframe
+              title="RATT Map"
+              width="100%"
+              height="180"
+              style="border:0"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://www.google.com/maps?q=Department%20of%20Physics%20%26%20Electronics%20Artillery%20Rd%20Makhanda%206139&output=embed">
+            </iframe>
+          </div>
+
+          <!-- SARAO address + map -->
+          <div class="col-12 col-md-6">
+            <h6 class="fw-semibold mb-1">SARAO</h6>
+            <address class="mb-2 small">
+              SARAO, Liesbeek House<br>
+              River Park, Liesbeek Parkway<br>
+              Settlers Way, Mowbray<br>
+              Cape Town, 7705
+            </address>
+            <iframe
+              title="SARAO Map"
+              width="100%"
+              height="180"
+              style="border:0"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://www.google.com/maps?q=NRF%2FSARAO%20-%20South%20African%20Radio%20Astronomy%20Observatory&output=embed">
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center small">
+      <div>
+        © {{ current_year or 2025 }} MGCLS-HI First Data Release is a product of
+        Rhodes University and the National Research Foundation – South African
+        Radio Astronomy Observatory (NRF–SARAO).
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+  crossorigin="anonymous"></script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

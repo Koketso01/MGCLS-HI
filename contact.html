@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Contact Us</h2>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="form-section">
+                <p class="text-muted">
+                    If you have any questions, suggestions, or feedback, please feel free to get in touch with the project team.
+                </p>
+
+                <ul class="list-unstyled">
+                    <li><strong>Project Lead:</strong> <a href="mailto:knowles.kenda@gmail.com">Dr. Kenda Knowles</a></li>
+                    <li><strong>Institution:</strong> Rhodes University / SARAO</li>
+                    <li><strong>Project:</strong> HI-MGCLS - Galaxy Cluster Explorer</li>
+                    <li><strong>Data Access Help:</strong> <a href="mailto:hi-mgcls-support@ska.ac.za">hi-mgcls-support@ska.ac.za</a></li>
+                </ul>
+
+                <p class="mt-4">
+                    For technical issues related to the website or the data visualisation tools, please contact the web administrator via the support email above.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <p class="mt-4 text-center">
+        <a href="{{ url_for('index') }}">← Back to Home</a>
+    </p>
+</div>
+{% endblock %}

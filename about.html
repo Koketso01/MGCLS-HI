@@ -1,0 +1,338 @@
+{% extends "layout.html" %}
+{% block title %}About · MGCLS–H I{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-4">
+
+  <!-- 1. Overview -->
+  <section class="mb-4">
+    <h1 class="mb-3" style="font-weight: 600;">
+      About the MGCLS–H&nbsp;I database
+    </h1>
+
+    <p>
+      The <strong>MeerKAT Galaxy Cluster Legacy Survey (MGCLS)</strong> is a large programme carried out
+      with the 64-dish MeerKAT telescope in South Africa. Between 2018 and 2019, MeerKAT observed
+      115 galaxy clusters for 6–10 hours each at L-band (≈900–1670&nbsp;MHz), producing deep, wide-field
+      radio imaging with typical sensitivities of a few μJy&nbsp;beam<sup>−1</sup> and angular resolutions of
+      ≈8&nbsp;arcsec. The first continuum data release (DR1) provides a rich set of products for studies of
+      radio galaxies, diffuse cluster emission and polarisation.
+    </p>
+
+    <p>
+      The <strong>MGCLS–H&nbsp;I project</strong> builds directly on this legacy by exploiting the neutral hydrogen
+      (H&nbsp;I 21-cm) line information embedded in the same visibilities. By reprocessing the original
+      MGCLS measurement sets in spectral-line mode, the project constructs a homogeneous database
+      of H&nbsp;I detections and data products for galaxies in and around MGCLS clusters. This website
+      hosts the first H&nbsp;I data release (H&nbsp;I–DR1).
+    </p>
+  </section>
+
+  <!-- 2. Why H I in Clusters? -->
+  <section class="mb-4">
+    <h2>Why neutral hydrogen (H&nbsp;I) in galaxy clusters?</h2>
+
+    <p>
+      Galaxies follow a set of well-known scaling relations that describe their formation and evolution,
+      such as the star-formation main sequence linking stellar mass and star-formation rate. Underlying
+      these relations is a <strong>gas-regulation cycle</strong>: galaxies acquire gas, store it in their discs,
+      convert part of it into stars, expel material through feedback, and may re-accrete gas over cosmic time.
+    </p>
+    <p>
+      Neutral atomic hydrogen (H&nbsp;I) is a key component of this cycle. It is a primary reservoir from which
+      molecular gas and stars ultimately form, and it is highly sensitive to environmental processes such as
+      ram-pressure stripping, tidal interactions and “pre-processing” in groups. Measuring where H&nbsp;I is
+      located, how much is present, and how it is removed or redistributed is therefore central to
+      understanding how galaxies grow and quench.
+    </p>
+    <p>
+      Single-dish surveys (e.g. HIPASS, ALFALFA) have mapped H&nbsp;I over large sky areas but at coarse
+      angular resolution, while interferometric surveys (WHISP, ATLAS<sup>3D</sup>, BlueDisk, VIVA, THINGS,
+      LVHIS) provide resolved views but typically over smaller areas and with non-uniform depth. As a
+      result, the literature still presents a fragmented picture of how H&nbsp;I content links to stellar mass,
+      environment and star-formation activity, especially in dense environments such as clusters.
+    </p>
+    <p>
+      MGCLS–H&nbsp;I directly addresses this gap by constructing a
+      <strong>homogeneous, cluster-focused, spatially resolved H&nbsp;I dataset</strong> across a well-defined
+      sample of galaxy clusters, all observed with the same telescope, frequency setup and reduction pipeline.
+    </p>
+  </section>
+
+  <!-- 3. From MGCLS to the MGCLS–H I Database -->
+  <section class="mb-4">
+    <h2>From MGCLS to the MGCLS–H&nbsp;I database</h2>
+
+    <p>
+      The MGCLS–H&nbsp;I project reprocesses the original MGCLS visibilities to extract the 21-cm line signal.
+      The available bandwidth and channelisation allow us to trace H&nbsp;I emission over a primary redshift
+      range of <strong>0 &lt; <em>z</em> &lt; 0.11</strong> (with additional sub-bands at higher redshift), covering galaxies
+      in environments from rich clusters to smaller groups.
+    </p>
+    <p>
+      The survey strategy is to first process the <strong>radio-selected cluster sample with
+      <em>z</em> &lt; 0.1</strong>, followed by X-ray selected clusters in the same redshift range. For each cluster,
+      a dedicated H&nbsp;I cube is produced over ≈1280–1430&nbsp;MHz, covering the relevant velocity range
+      around the cluster systemic redshift.
+    </p>
+    <p>
+      The goal is to create a <strong>legacy H&nbsp;I database</strong> that enables robust statistical studies across
+      thousands of galaxies and dozens of clusters, with uniform sensitivity, well-documented completeness
+      and consistent data products. The database is hosted at Rhodes University, and this website provides
+      the first public data release (H&nbsp;I–DR1).
+    </p>
+    <p>
+      The development of the database and associated workflow has been carried out over a dedicated
+      multi-year effort, in close collaboration with MGCLS team members who initiated the early H&nbsp;I
+      exploration, tuning of pipeline parameters and design of the database schema. This release represents
+      the first step in turning the full MGCLS H&nbsp;I information into a long-lived community resource.
+    </p>
+  </section>
+
+  <!-- 4. Processing & Workflow -->
+  <section class="mb-4">
+    <h2>Processing workflow and data preparation</h2>
+
+    <p>
+      The MGCLS–H&nbsp;I data products are derived from the original MeerKAT visibilities using a uniform
+      spectral-line reduction and staging workflow. At a high level:
+    </p>
+
+    <ul>
+      <li><strong>Raw MeerKAT visibilities</strong> are ingested from the science archive.</li>
+      <li>
+        <strong>Flagging, calibration and self-calibration</strong> are applied using a standard spectral-line
+        reduction pipeline, including radio-frequency interference (RFI) mitigation, cross-calibration and
+        iterative self-calibration.
+      </li>
+      <li>
+        <strong>Continuum subtraction and line imaging</strong> are performed to isolate the H&nbsp;I line signal,
+        producing primary-beam-corrected data cubes on a regular spatial–spectral grid.
+      </li>
+      <li>
+        <strong>3-D source finding and parameter extraction</strong> are run on the cubes to identify H&nbsp;I
+        emission in position–position–velocity space and to measure basic source properties.
+      </li>
+      <li>
+        <strong>Completeness testing with mock galaxy injection and recovery experiments</strong> is used to
+        quantify the H&nbsp;I mass and linewidth ranges over which the survey is statistically complete, as a
+        function of redshift, linewidth and cube depth.
+      </li>
+      <li>
+        <strong>Galaxy-level products</strong> (H&nbsp;I cubelets, moment maps, velocity fields, line profiles and
+        masks) are cut out and associated with their parent cluster and catalogued in a consistent schema.
+      </li>
+      <li>
+        <strong>Quality assessment and staging</strong> are performed before products are ingested into the
+        MGCLS–H&nbsp;I database and exposed through this website.
+      </li>
+    </ul>
+
+    <p>
+      This end-to-end approach ensures that all clusters in the database are reduced with compatible
+      settings and that the resulting catalogues can be used for homogeneous population studies,
+      completeness-limited analyses and detailed follow-up work.
+    </p>
+  </section>
+
+  <!-- 5. Data Products -->
+  <section class="mb-4">
+    <h2>What is included in MGCLS–H&nbsp;I DR1?</h2>
+
+    <p>
+      The first MGCLS–H&nbsp;I data release focuses on a staged subset of MGCLS clusters for which
+      the H&nbsp;I cubes and catalogues have passed the current quality checks. For each cluster, the
+      database provides:
+    </p>
+
+    <ul>
+      <li>
+        <strong>Cluster-level metadata</strong> – basic properties such as redshift, dynamical mass proxies,
+        image depth, beam size and H&nbsp;I column-density sensitivity.
+      </li>
+      <li>
+        <strong>Primary-beam-corrected H&nbsp;I cubes</strong> – full-field spectral cubes centred on the
+        cluster pointing.
+      </li>
+      <li>
+        <strong>Galaxy-level catalogues</strong> – H&nbsp;I detections with positions, velocities, integrated
+        fluxes, linewidths and a set of basic morphological descriptors.
+      </li>
+      <li>
+        <strong>H&nbsp;I cubelets and moment maps</strong> – small cutouts around each detection, including
+        total intensity (moment-0), velocity fields (moment-1) and, where appropriate, velocity-dispersion
+        maps (moment-2).
+      </li>
+      <li>
+        <strong>Masks and diagnostic products</strong> – source masks, signal-to-noise maps and quality
+        flags that allow users to assess the robustness of each detection.
+      </li>
+      <li>
+        <strong>Multi-wavelength preview figures</strong> – quick-look overlays that combine H&nbsp;I, X-ray
+        and optical information for many fields.
+      </li>
+    </ul>
+  </section>
+
+  <!-- 6. Example H I clusters from the MGCLS paper -->
+  <section class="mb-4">
+    <h2>Example H&nbsp;I clusters in the MGCLS paper</h2>
+
+    <p>
+      The parent MGCLS paper presents early H&nbsp;I results for four representative galaxy clusters,
+      primarily to demonstrate data quality and science potential:
+      <strong>Abell&nbsp;194, Abell&nbsp;4038, Abell&nbsp;3562</strong> and <strong>Abell&nbsp;3365</strong>. These clusters lie in the
+      redshift range 0.01&nbsp;&lt;&nbsp;<em>z</em>&nbsp;&lt;&nbsp;0.1 and were selected from an X-ray-detected cluster catalogue,
+      spanning a broad range of X-ray luminosity
+      (L<sub>X</sub> ≈ (0.07–1.3)×10<sup>44</sup>&nbsp;erg&nbsp;s<sup>−1</sup>) and virial mass
+      (M<sub>v</sub> ≈ 0.4–2.4×10<sup>14</sup>&nbsp;M<sub>⊙</sub>).
+    </p>
+
+    <div class="table-responsive">
+      <table class="table table-sm table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Cluster</th>
+            <th>z (approx.)</th>
+            <th>Environment / mass scale</th>
+            <th>Illustrative H&nbsp;I science</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Abell&nbsp;194</strong></td>
+            <td>≈0.018</td>
+            <td>
+              Low-mass, relatively poor cluster (M<sub>v</sub> ~ few ×10<sup>13</sup>&nbsp;M<sub>⊙</sub>) with prominent
+              radio galaxies and extended jets.
+            </td>
+            <td>
+              Resolved H&nbsp;I discs in a group-like environment, probing how gas content and disc structure
+              change in a low-mass cluster and its surroundings.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Abell&nbsp;4038</strong></td>
+            <td>≈0.028</td>
+            <td>
+              More massive cluster (M<sub>v</sub> ~ 2×10<sup>14</sup>&nbsp;M<sub>⊙</sub>) with bright central radio emission
+              and complex ICM structure.
+            </td>
+            <td>
+              H&nbsp;I detections in a dense core environment, useful for studying gas depletion and the
+              deficit of high-mass H&nbsp;I galaxies relative to the field.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Abell&nbsp;3562</strong></td>
+            <td>≈0.049</td>
+            <td>
+              Cluster in the Shapley supercluster region, at the higher-mass end of the MGCLS example set.
+            </td>
+            <td>
+              Combination of resolved H&nbsp;I structures and disturbed morphologies, tracing environmental
+              processes such as stripping and pre-processing in a complex large-scale structure.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Abell&nbsp;3365</strong></td>
+            <td>≈0.093</td>
+            <td>
+              Higher-redshift cluster near the upper end of the low-RFI H&nbsp;I window, with more limited
+              sensitivity and stronger RFI constraints.
+            </td>
+            <td>
+              Demonstrates what can be achieved at the high-<em>z</em> end of the MGCLS H&nbsp;I volume, including
+              resolved H&nbsp;I discs in systems with very different radio-continuum properties.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="mb-0">
+      Together, these four clusters highlight the diversity of environments probed by MGCLS–H&nbsp;I and
+      illustrate how the same observing setup can be used to study H&nbsp;I in poor groups, rich clusters
+      and supercluster regions.
+    </p>
+  </section>
+
+  <!-- 7. Science Enabled -->
+  <section class="mb-4">
+    <h2>Science enabled by the MGCLS–H&nbsp;I database</h2>
+
+    <p>
+      By combining a well-defined cluster sample with spatially resolved H&nbsp;I measurements, the
+      MGCLS–H&nbsp;I database enables a wide range of environmental and evolutionary studies, including:
+    </p>
+
+    <ul>
+      <li>
+        <strong>H&nbsp;I content and deficiency in clusters</strong> compared to the field, including trends with
+        cluster-centric distance, local density and projected phase-space location.
+      </li>
+      <li>
+        <strong>Gas stripping and morphological transformation</strong>, tracing truncated H&nbsp;I discs,
+        one-sided tails and disturbed kinematics associated with ram-pressure stripping, harassment
+        and tidal interactions.
+      </li>
+      <li>
+        <strong>Pre-processing in groups and filaments</strong>, using galaxies outside the virial radius to
+        study how gas is removed before galaxies reach the cluster core.
+      </li>
+      <li>
+        <strong>H&nbsp;I mass function and scaling relations in dense environments</strong>, enabling
+        comparisons with single-dish surveys and constraining how H&nbsp;I fractions depend on stellar
+        mass, environment and star-formation activity.
+      </li>
+      <li>
+        <strong>Links between H&nbsp;I structure and multi-wavelength tracers</strong>, such as X-ray
+        emission from the intracluster medium, optical morphologies and star-formation indicators.
+      </li>
+    </ul>
+
+    <p>
+      Because the database is homogeneous, well-documented and cluster-centric, it is well suited to both
+      targeted case studies of individual systems and statistical analyses across the ensemble.
+    </p>
+  </section>
+
+  <!-- 8. Access & Documentation -->
+  <section class="mb-4">
+    <h2>Access, documentation and further reading</h2>
+
+    <p>
+      All released products in MGCLS–H&nbsp;I DR1 are made available via this web interface and are
+      ultimately hosted in an AWS S3 bucket. Users can browse clusters and galaxies, preview figures,
+      and download catalogues, cubelets or full cubes for local analysis.
+    </p>
+    <p>
+      Technical details of the parent MGCLS survey, observing strategy and continuum data products are
+      described in:
+    </p>
+    <ul>
+      <li>
+        <a href="{{ url_for('static', filename='2111.05673v1.pdf') }}" target="_blank">
+          Knowles et&nbsp;al. (2021) – MGCLS overview and first data release
+        </a>
+      </li>
+    </ul>
+    <p>
+      A dedicated MGCLS–H&nbsp;I early-release or description paper provides further details of the H&nbsp;I
+      reduction, completeness analysis and database design. A pre-release version of this work is
+      available here:
+    </p>
+    <ul>
+      <li>
+        <a href="{{ url_for('static', filename='MGCLS_HI_early_data_release.pdf') }}" target="_blank">
+          MGCLS–H&nbsp;I early data release and survey description
+        </a>
+      </li>
+    </ul>
+  </section>
+
+    </div>
+  </section>
+
+</div>
+{% endblock %}

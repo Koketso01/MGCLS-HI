@@ -1,0 +1,126 @@
+{% extends "layout.html" %}
+{% block title %}Publications · MGCLS–H I{% endblock %}
+
+{% block content %}
+<div class="container-xl mt-4 px-3">
+
+  <h1 class="mb-3">Publications</h1>
+
+  <!-- Papers per year -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Papers per year</h5>
+      <canvas id="pubsPerYear" height="80"></canvas>
+    </div>
+  </div>
+
+  <!-- Publications table -->
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th style="white-space:nowrap;">Year</th>
+          <th>Title</th>
+          <th style="min-width:180px;">Authors</th>
+          <th style="min-width:180px;">Sample (cluster/galaxy)</th>
+          <th class="text-nowrap">Links</th>
+          <th class="text-nowrap">Abstract</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pubs %}
+          {% set rid = 'abs' ~ loop.index %}
+          <tr>
+            <td>{{ p.year or '' }}</td>
+            <td><strong>{{ p.title }}</strong></td>
+            <td>{{ p.authors }}</td>
+            <td>
+              {% if p.sample %}
+                {% for tag in p.sample.split(',') %}
+                  <span class="badge text-bg-secondary me-1 mb-1">{{ tag.strip() }}</span>
+                {% endfor %}
+              {% endif %}
+            </td>
+            <td class="text-nowrap">
+              {% if p.link %}
+                <a class="btn btn-sm btn-outline-primary" href="{{ p.link }}" target="_blank" rel="noopener">Open</a>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if p.abstract %}
+                <button class="btn btn-sm btn-outline-secondary" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#{{ rid }}"
+                        aria-expanded="false" aria-controls="{{ rid }}">
+                  Show
+                </button>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% if p.abstract %}
+          <tr class="table-light">
+            <td colspan="6" class="p-0">
+              <div id="{{ rid }}" class="collapse">
+                <div class="p-3">
+                  <div class="small text-uppercase text-muted mb-1">Abstract</div>
+                  <div style="white-space:pre-wrap;">{{ p.abstract }}</div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if pubs|length == 0 %}
+    <div class="alert alert-info">
+      No publications loaded yet.
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <!-- Chart.js for the bar chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
+          integrity="sha384-yqB6pR4W8Sh/2rIul2JUfV134cFpmA1QhH0v+Yc6t3H0hZ9Mbi0p1zGktc5y5Vf/"
+          crossorigin="anonymous"></script>
+  <script>
+    (function() {
+      const labels = {{ chart_labels|tojson }};
+      const counts = {{ chart_counts|tojson }};
+      const ctx = document.getElementById('pubsPerYear');
+      if (ctx && labels && labels.length) {
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Publications',
+              data: counts
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { title: { display: true, text: 'Year' } },
+              y: { beginAtZero: true, title: { display: true, text: 'Count' }, ticks: { precision: 0 } }
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: { intersect: false, mode: 'index' }
+            }
+          }
+        });
+      }
+    })();
+  </script>
+{% endblock %}

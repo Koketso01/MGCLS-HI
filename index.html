@@ -1,0 +1,261 @@
+{% extends "layout.html" %}
+{% block title %}Home · MGCLS–H I{% endblock %}
+
+{% block content %}
+{# ---- Resolve context safely ---- #}
+{% set labels = header_labels if header_labels is defined else [] %}
+{% set units  = header_units  if header_units  is defined else [] %}
+{% set data   = rows          if rows          is defined else [] %}
+{% set pager  = pagination    if pagination    is defined else {} %}
+
+{# Query value (prefer ctx quick_filter, else URL param) #}
+{% set qval = quick_filter if quick_filter is defined and quick_filter is not none else (request.args.get('q') or '') %}
+
+{# Pager defaults #}
+{% set page      = (pager.page if pager and 'page' in pager else 1) %}
+{% set page_size = (pager.page_size if pager and 'page_size' in pager else 25) %}
+{% set total     = (pager.total if pager and 'total' in pager else (data|length)) %}
+{% set num_pages = (pager.num_pages if pager and 'num_pages' in pager else 1) %}
+
+<section class="mb-4 science-hero">
+  <div class="container-fluid wide-wrap px-0">
+    <div class="row g-4 align-items-start">
+
+      <!-- Left: science summary -->
+      <div class="col-12 col-lg-8">
+        <div class="bg-white rounded-3 shadow-sm p-4">
+          <h1 class="mb-3 text-center" style="color: #4a148c;">
+            Welcome to MGCLS–H&nbsp;I (DR1)
+          </h1>
+
+          <p>
+            The MGCLS–H&nbsp;I database is the dedicated neutral hydrogen (H&nbsp;I) companion to the
+            <a href="https://mgcls.sarao.ac.za/" target="_blank" rel="noopener" style="color: #0d6efd;">
+              MeerKAT Galaxy Cluster Legacy Survey (MGCLS)
+            </a>.
+            It assembles a homogeneous view of H&nbsp;I in galaxies spanning environments from
+            massive clusters to groups over the redshift range
+            <span class="fw-semibold">0 &lt; z &lesssim; {{ hi_stats.z_max }}</span>.
+          </p>
+
+          <p>
+            All fields are processed through a single end-to-end workflow: spectral-line calibration
+            and imaging with
+            <a href="https://caracal.readthedocs.io/en/latest/" target="_blank" rel="noopener" style="color: #0d6efd;">
+              CARACal
+            </a>,
+            H&nbsp;I source detection with
+            <a href="https://gitlab.com/SoFiA-Admin/SoFiA-2" target="_blank" rel="noopener" style="color: #0d6efd;">
+              SoFiA-2
+            </a>
+            (and completeness tests with
+            <a href="https://editeodoro.github.io/Bbarolo/" target="_blank" rel="noopener" style="color: #0d6efd;">
+              3D-Barolo
+            </a>),
+            and quality assessment before staging into this database. This avoids the mixed
+            sensitivities, resolutions and selection functions that complicate the comparison of
+            legacy H&nbsp;I surveys.
+          </p>
+
+          <p>
+            The database provides a uniform interferometric view of H&nbsp;I over
+            <span class="fw-semibold">{{ hi_stats.v_min }}–{{ hi_stats.v_max }}&nbsp;km/s</span>
+            (corresponding to ≈{{ hi_stats.f_min }}–{{ hi_stats.f_max }}&nbsp;MHz) with typical
+            column-density sensitivities down to
+            <span class="fw-semibold">
+              N<sub>HI</sub> ≈ {{ hi_stats.nhi_min_html|safe }}&nbsp;cm⁻²
+            </span>
+            (1σ, field dependent).
+          </p>
+
+          <p class="mb-0">
+            Whether the focus is gas stripping, environmental quenching, scaling relations or
+            benchmarking simulations, the aim is to provide a clean, homogeneous sample for robust
+            statistical and spatially resolved H&nbsp;I science. Think of it as the
+            <span class="fw-semibold">“gas-physics layer” of MGCLS</span>, packaged for fast
+            browsing, easy download and real science.
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: at-a-glance summary with dynamic numbers -->
+      <div class="col-12 col-lg-4">
+        <div class="bg-white rounded-3 shadow-sm p-4 h-100">
+          <h2 class="hi-glance-title mb-3">
+            MGCLS–H&nbsp;I at a Glance
+          </h2>
+
+          <ul class="list-unstyled mb-3">
+            <li class="mb-1">
+              <span class="fw-semibold">Number of H&nbsp;I clusters staged:</span>
+              {{ hi_stats.num_clusters }}
+            </li>
+            <li class="mb-1">
+              <span class="fw-semibold">Number of H&nbsp;I-detected galaxies staged:</span>
+              {{ hi_stats.num_galaxies }}
+            </li>
+            <li class="mb-1">
+              <span class="fw-semibold">Redshift coverage:</span>
+              0 &lt; z &lesssim; {{ hi_stats.z_max }}
+            </li>
+            <li class="mb-1">
+              <span class="fw-semibold">Velocity coverage:</span>
+              {{ hi_stats.v_min }}–{{ hi_stats.v_max }} km/s
+            </li>
+            <li class="mb-1">
+              <span class="fw-semibold">Frequency coverage:</span>
+              {{ hi_stats.f_min }}–{{ hi_stats.f_max }} MHz
+            </li>
+          </ul>
+
+          <!-- Depth & Resolution as a bulleted list -->
+          <p class="data-products-intro mt-3 mb-2 fw-semibold">
+            Depth &amp; Resolution
+          </p>
+          <ul class="mb-3 data-products-list">
+            <li class="mb-1">
+              Image rms (1σ): {{ hi_stats.rms_min_mjy }}–{{ hi_stats.rms_max_mjy }} mJy/beam
+            </li>
+            <li class="mb-1">
+              H&nbsp;I column density: ≈ {{ hi_stats.nhi_min_html|safe }}–{{ hi_stats.nhi_max_html|safe }} cm⁻²
+            </li>
+            <li class="mb-1">
+              Angular resolution: {{ hi_stats.beam_min }}–{{ hi_stats.beam_max }} arcsec
+            </li>
+            <li class="mb-1">
+              Dynamical cluster halo masses:
+              {{ hi_stats.mass_min_html|safe }}–{{ hi_stats.mass_max_html|safe }} M☉
+            </li>
+          </ul>
+
+
+
+
+          <p class="data-products-intro mt-3 mb-2 fw-semibold">
+            This first MGCLS–H&nbsp;I release provides the following science-ready data products:
+          </p>
+          <ul class="mb-3 data-products-list">
+            <li class="mb-1">H&nbsp;I source catalogues (per cluster)</li>
+            <li class="mb-1">Moment maps and velocity fields (per cluster)</li>
+            <li class="mb-1">H&nbsp;I cubelets for each detected galaxy</li>
+            <li class="mb-1">Signal-to-noise, mask and diagnostic products</li>
+            <li class="mb-1">Multi-wavelength preview figures for each cluster</li>
+          </ul>
+
+          <p class="small mb-0">
+            Hosted at Rhodes University and supported by the NRF–SARAO and partner institutions.
+            The front-end is static and serverless; users only pay the cost of viewing and
+            downloading the products they need.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+<div class="table-toolbar d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+  <div class="left">
+    <h1 class="h1 mb-1">MGCLS–H I Clusters</h1>
+    <div class="text-muted small">
+      See <a href="{{ url_for('help') }}">Columns &amp; Units</a> for definitions.
+    </div>
+  </div>
+
+  <form method="get" class="right d-flex gap-2 align-items-center" action="{{ url_for('index') }}">
+    <input class="form-control" style="min-width: 320px" type="text" name="q" value="{{ qval }}"
+           placeholder="Filter by Cluster, MGCLS name, SBID, Capture ID">
+    <input type="hidden" name="page_size" value="{{ page_size }}">
+    <button type="submit" class="btn btn-primary">Filter</button>
+    {% if qval %}
+      <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Clear</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="table-wrap table-responsive">
+  <table class="table table-striped table-hover table-sm align-middle data-table">
+    <thead class="table-light">
+      <tr>
+        {% for h in labels %}
+          <th scope="col">{{ h }}</th>
+        {% endfor %}
+      </tr>
+      <tr class="units-row">
+        {% for u in units %}
+          <th scope="col" class="text-muted small">{{ u }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% if data and data|length > 0 %}
+        {% for r in data %}
+          {# Clickable rows: link to /cluster/<ID>. Handle list rows (preferred) and dicts #}
+          {% if r is mapping %}
+            {% set cluster_id = r.get('Name') or r.get('ID') or r.get(labels[0]) %}
+            <tr class="click-row" data-href="{{ url_for('cluster_detail', cluster_id=cluster_id) }}">
+              {% for h in labels %}
+                {% if loop.first %}
+                  <td><a href="{{ url_for('cluster_detail', cluster_id=cluster_id) }}">{{ r.get(h, '') }}</a></td>
+                {% else %}
+                  <td>{{ r.get(h, '') }}</td>
+                {% endif %}
+              {% endfor %}
+            </tr>
+          {% else %}
+            {% set cluster_id = r[0] %}
+            <tr class="click-row" data-href="{{ url_for('cluster_detail', cluster_id=cluster_id) }}">
+              {% for c in r %}
+                {% if loop.first %}
+                  <td><a href="{{ url_for('cluster_detail', cluster_id=cluster_id) }}">{{ c }}</a></td>
+                {% else %}
+                  <td>{{ c }}</td>
+                {% endif %}
+              {% endfor %}
+            </tr>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <tr><td colspan="{{ labels|length }}" class="text-center text-muted py-4">No rows.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+{# Pagination #}
+<div class="d-flex justify-content-between align-items-center mt-2">
+  <div class="small text-muted">
+    Page {{ page }} of {{ num_pages }} · Showing {{ page_size }} per page · Total {{ total }}
+  </div>
+  <div class="pager-links d-flex gap-2">
+    {% if page > 1 %}
+      <a class="btn btn-outline-secondary btn-sm"
+         href="{{ url_for('index') }}?page={{ page-1 }}&page_size={{ page_size }}{% if qval %}&q={{ qval | urlencode }}{% endif %}">← Prev</a>
+    {% endif %}
+    {% if page < num_pages %}
+      <a class="btn btn-outline-secondary btn-sm"
+         href="{{ url_for('index') }}?page={{ page+1 }}&page_size={{ page_size }}{% if qval %}&q={{ qval | urlencode }}{% endif %}">Next →</a>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  /* Visual cue for clickable rows */
+  tr.click-row { cursor: pointer; }
+  tr.click-row:hover { background-color: rgba(13,110,253,.06); }
+</style>
+<script>
+  // Make the whole row clickable, but ignore clicks on interactive elements
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('tr.click-row').forEach(function (tr) {
+      tr.addEventListener('click', function (e) {
+        if (e.target.closest('a, button, input, label, select, textarea, .btn')) return;
+        const href = tr.getAttribute('data-href');
+        if (href) window.location = href;
+      });
+    });
+  });
+</script>
+{% endblock %}

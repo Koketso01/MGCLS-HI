@@ -1,0 +1,676 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container-fluid wide-wrap mt-4 px-4">
+
+  <h1 class="mb-4">Help &amp; User Guide</h1>
+
+  <p class="mb-4">
+    This page explains how to use the MGCLS–H&nbsp;I database, how to interpret the
+    cluster and galaxy catalogues, and how the main physical quantities are defined.
+    It is intended for scientifically literate users (students, researchers and data
+    scientists) who want to work directly with the released products.
+  </p>
+
+  <div class="accordion" id="helpAccordion">
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- 1. Quick User Guide                                                -->
+    <!-- ------------------------------------------------------------------ -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingGuide">
+        <button class="accordion-button" type="button"
+                data-bs-toggle="collapse" data-bs-target="#collapseGuide"
+                aria-expanded="true" aria-controls="collapseGuide">
+          1. User Guide: Searching, Inspecting and Downloading Data
+        </button>
+      </h2>
+      <div id="collapseGuide" class="accordion-collapse collapse show"
+           aria-labelledby="headingGuide" data-bs-parent="#helpAccordion">
+        <div class="accordion-body">
+
+          <h3 class="h4 mt-2">1.1. Cluster search</h3>
+          <p>
+            On the <strong>Home</strong> and <strong>Search</strong> pages you can start
+            from the cluster catalogue:
+          </p>
+          <ul>
+            <li>
+              Use the <strong>cluster name / ID</strong> field to search by MGCLS name
+              (e.g. <code>Abell-194</code>, <code>j012547-012223</code>) or other
+              identifiers exposed in the interface.
+            </li>
+            <li>
+              Use filters such as <strong>redshift</strong>, <strong>R</strong><sub>200</sub>,
+              or <strong>velocity range</strong> where available to narrow down the field.
+            </li>
+            <li>
+              The results table links to a cluster detail page with preview figures,
+              basic parameters and links to download the associated products.
+            </li>
+          </ul>
+
+          <h3 class="h4 mt-3">1.2. Galaxy / H&nbsp;I source search</h3>
+          <p>
+            Once a cluster is selected, you can explore the associated H&nbsp;I detections:
+          </p>
+          <ul>
+            <li>
+              The <strong>galaxy table</strong> lists all H&nbsp;I sources detected in the
+              cube for that cluster field.
+            </li>
+            <li>
+              You can sort and filter by quantities such as
+              <em>v</em><sub>rad</sub>, line width, integrated H&nbsp;I flux, or
+              H&nbsp;I mass (if provided).
+            </li>
+            <li>
+              RA/Dec columns provide the sky position of each detection; velocities are
+              in km&nbsp;s<sup>−1</sup> and can be converted to redshift or used for
+              phase–space diagrams.
+            </li>
+          </ul>
+
+          <h3 class="h4 mt-3">1.3. Preview figures and quick-look science</h3>
+          <p>
+            Each cluster page includes multi-wavelength previews (radio, optical, X-ray
+            and overlays). These are intended as quick-look diagnostics:
+          </p>
+          <ul>
+            <li>Identify interesting systems (e.g. ram-pressure stripped galaxies, tails, H&nbsp;I holes).</li>
+            <li>Visually inspect the H&nbsp;I morphology relative to the cluster ICM and galaxy distribution.</li>
+            <li>Check the footprint and depth before downloading full cubes or cubelets.</li>
+          </ul>
+
+          <h3 class="h4 mt-3">1.4. Downloading data products</h3>
+          <p>
+            For each cluster, the database provides downloadable packages, typically as
+            compressed archives (ZIP or similar):
+          </p>
+          <ul>
+            <li>Cluster-level H&nbsp;I cubes and moment maps.</li>
+            <li>Per-cluster H&nbsp;I catalogues (cluster table and galaxy table).</li>
+            <li>Galaxy cubelets and associated diagnostic products.</li>
+          </ul>
+          <p>
+            Once downloaded, the FITS products can be analysed with common astronomy
+            tools (e.g. Python/astropy, CASA, your own pipelines).
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- 2. Cluster Catalogue: Columns & Units                              -->
+    <!-- ------------------------------------------------------------------ -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingClusters">
+        <button class="accordion-button collapsed" type="button"
+                data-bs-toggle="collapse" data-bs-target="#collapseClusters"
+                aria-expanded="false" aria-controls="collapseClusters">
+          2. Cluster Catalogue: Columns, Units and Definitions
+        </button>
+      </h2>
+      <div id="collapseClusters" class="accordion-collapse collapse"
+           aria-labelledby="headingClusters" data-bs-parent="#helpAccordion">
+        <div class="accordion-body">
+
+          <p>
+            The <strong>cluster catalogue</strong> describes each MGCLS–H&nbsp;I field:
+            sky position, observing setup and basic dynamical properties. The physical
+            quantities are written in standard notation, e.g.
+            <em>R</em><sub>200</sub>, <em>σ</em><sub>v</sub>,
+            <em>N</em><sub>HI</sub>, <em>M</em><sub>⊙</sub>.
+          </p>
+
+          <p><strong>Example entry (Abell-194):</strong></p>
+          <pre class="bg-light p-2 small">
+ID          z       RA          DEC          DATE                  SBID          CAPTURE-ID  R<sub>200</sub>  σ<sub>v</sub>   Detections  RMS      NHI<sub>min</sub>   NHI<sub>max</sub>   V<sub>min</sub>  V<sub>max</sub>  NCHAN  FREQ<sub>min</sub>  FREQ<sub>max</sub>  BMIN   BMAJ   BPA     MGCLS-ID          Mass
+Abell-194   0.0180  01:25:47.0  -01:22:23.0  2018-11-08T16:36:26Z  20181108-0033 1541694981   1.03       421.0        19      0.1642   5.43e19     7.72e20      2444     8090     129    2.44        8.09        31.6   38.8   538.5   j012547-012223   1.27e14
+          </pre>
+
+          <p>
+            The table below describes each column in scientific terms.
+          </p>
+
+          <div class="table-responsive">
+            <table class="table table-sm table-striped align-middle">
+              <thead>
+                <tr>
+                  <th>Column</th>
+                  <th>Units</th>
+                  <th>Definition &amp; scientific usage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>Cluster (Name/ID)</code></td>
+                  <td>–</td>
+                  <td>
+                    Cluster / field identifier (e.g. Abell-, RXC-, MACS- or MGCLS-based name).
+                    Used as the primary human–readable name for the pointing.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>z</code></td>
+                  <td><em>z</em></td>
+                  <td>
+                    Target redshift used to set the H&nbsp;I tuning (dimensionless).
+                    This is effectively the cluster redshift assumed when defining the
+                    frequency range of the spectral-line observation.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>RA</code></td>
+                  <td>HH:MM:SS.S (J2000)</td>
+                  <td>
+                    Right Ascension of the pointing centre in sexagesimal hours, minutes
+                    and seconds (J2000). Combined with Dec it specifies the sky position
+                    of the beam centre. Can be converted to decimal degrees for analysis.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>DEC</code></td>
+                  <td>DD:MM:SS.S (J2000)</td>
+                  <td>
+                    Declination of the pointing centre in sexagesimal degrees, arcminutes
+                    and arcseconds (J2000).
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>DATE</code></td>
+                  <td>UTC (ISO&nbsp;8601)</td>
+                  <td>
+                    Start date and time of the observation in Coordinated Universal Time,
+                    formatted as <code>YYYY-MM-DDTHH:MM:SSZ</code>.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>SBID</code></td>
+                  <td>–</td>
+                  <td>
+                    MeerKAT Schedule Block identifier. Unique ID for the observing block
+                    in the telescope scheduling system.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>CAPTURE ID</code></td>
+                  <td>–</td>
+                  <td>
+                    Internal capture identifier for the raw observation in the archive,
+                    used when tracing the data back to telescope ingest.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>R<sub>200</sub></code></td>
+                  <td>Mpc</td>
+                  <td>
+                    Radius <em>R</em><sub>200</sub> within which the mean mass density of
+                    the cluster is 200 times the critical density of the Universe at the
+                    cluster redshift:
+                    <br>
+                    ⟨<em>ρ</em>(<em>r</em> &lt; <em>R</em><sub>200</sub>)⟩ =
+                    200&nbsp;<em>ρ</em><sub>crit</sub>(<em>z</em>).
+                    <br>
+                    Often used as a characteristic size of the dark-matter halo and when
+                    defining “cluster-centric radius” for phase-space and environmental
+                    studies.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>σ<sub>v</sub></code></td>
+                  <td>km&nbsp;s<sup>−1</sup></td>
+                  <td>
+                    One-dimensional velocity dispersion <em>σ</em><sub>v</sub> of cluster
+                    galaxies, derived from optical redshift measurements. This is a key
+                    dynamical indicator and mass proxy;
+                    <em>M</em><sub>200</sub> ∝ <em>σ</em><sub>v</sub><sup>α</sup> with
+                    α ≈ 3–4 in many calibrations.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>Detections</code></td>
+                  <td>count</td>
+                  <td>
+                    Number of H&nbsp;I sources detected in the primary beam of this cube
+                    (after applying the MGCLS–H&nbsp;I selection, quality control and masking).
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>RMS</code></td>
+                  <td>Jy&nbsp;beam<sup>−1</sup></td>
+                  <td>
+                    Typical image root-mean-square noise per beam in a representative
+                    channel of the H&nbsp;I cube (after continuum subtraction and imaging).
+                    Sets the baseline sensitivity used to compute column-density limits.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>NHI<sub>min</sub></code>,
+                    <code>NHI<sub>max</sub></code>
+                  </td>
+                  <td>cm<sup>−2</sup></td>
+                  <td>
+                    <strong>H&nbsp;I column-density sensitivity range of the cube.</strong>
+                    Column density <em>N</em><sub>HI</sub> measures how many neutral
+                    hydrogen atoms are present along the line of sight. For optically thin
+                    21-cm emission,
+                    <br>
+                    <div class="mt-1 mb-2" style="font-family: 'Times New Roman', serif;">
+                      <em>N</em><sub>HI</sub> ≈ 1.823 × 10<sup>18</sup>
+                      ∫ <em>T</em><sub>B</sub>(v) d<em>v</em>
+                      &nbsp;&nbsp; cm<sup>−2</sup>,
+                    </div>
+                    where <em>T</em><sub>B</sub> is the brightness temperature (K) and
+                    d<em>v</em> is velocity in km&nbsp;s<sup>−1</sup>.
+                    <br><br>
+                    <strong><code>NHI<sub>min</sub></code></strong> is the
+                    <em>minimum detectable</em> column density, set by the image rms noise
+                    and effective velocity resolution:
+                    <br>
+                    <div class="mt-1 mb-2" style="font-family: 'Times New Roman', serif;">
+                      <em>N</em><sub>HI,min</sub> ≈
+                      1.823 × 10<sup>18</sup> ·
+                      <em>T</em><sub>B,rms</sub> · Δ<em>v</em>,
+                    </div>
+                    where <em>T</em><sub>B,rms</sub> is derived from the rms flux density
+                    (Jy&nbsp;beam<sup>−1</sup>) using the beam solid angle.
+                    Lower values correspond to deeper, more sensitive cubes capable of
+                    detecting faint diffuse gas.
+                    <br><br>
+                    <strong><code>NHI<sub>max</sub></code></strong> is an approximate
+                    <em>maximum reliably measurable</em> column density before saturation,
+                    non-linearities or beam-smearing effects become important. It is
+                    usually set by the brightest emission in the field and characterises
+                    the usable dynamic range.
+                    <br><br>
+                    Together, the interval
+                    <code>[NHI<sub>min</sub> → NHI<sub>max</sub>]</code> describes the full range
+                    of column densities probed in a given cube.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>V<sub>min</sub></code>,
+                    <code>V<sub>max</sub></code>
+                  </td>
+                  <td>km&nbsp;s<sup>−1</sup></td>
+                  <td>
+                    Minimum and maximum barycentric radial velocity covered by the cube.
+                    These define the usable H&nbsp;I velocity window and are directly
+                    related to the frequency tuning.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>NCHAN</code></td>
+                  <td>–</td>
+                  <td>
+                    Number of spectral channels between
+                    <code>V<sub>min</sub></code> and <code>V<sub>max</sub></code>.
+                    Combined with the velocity range, this sets the channel width and
+                    effective spectral resolution.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>FREQ<sub>min</sub></code>,
+                    <code>FREQ<sub>max</sub></code>
+                  </td>
+                  <td>MHz</td>
+                  <td>
+                    Minimum and maximum sky frequency of the spectral-line band in MHz.
+                    The rest frequency of the H&nbsp;I 21-cm line is
+                    1420.4058&nbsp;MHz; the tuning corresponds roughly to the cluster
+                    redshift via
+                    <em>ν</em> ≈ 1420.4058 / (1 + <em>z</em>) MHz.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>BMIN</code>, <code>BMAJ</code></td>
+                  <td>arcsec</td>
+                  <td>
+                    Full width at half maximum (FWHM) of the synthesised beam’s minor and
+                    major axes. These define the angular resolution of the cube and the
+                    smallest structures that can be resolved.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>BPA</code></td>
+                  <td>deg</td>
+                  <td>
+                    Beam position angle (PA) in degrees, measured from north through east.
+                    Specifies the orientation of the elliptical synthesised beam on the sky.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>MGCLS Field Name</code></td>
+                  <td>–</td>
+                  <td>
+                    Internal MGCLS short name for the pointing
+                    (e.g. <code>j012547-012223</code>), derived from the RA/Dec of the
+                    radio source used in the legacy survey.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>Mass</code></td>
+                  <td><em>M</em><sub>⊙</sub></td>
+                  <td>
+                    Estimated total cluster mass, typically close to
+                    <em>M</em><sub>200</sub> (mass within <em>R</em><sub>200</sub>),
+                    derived from dynamical or X-ray proxies and expressed in solar masses.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- 3. Galaxy Catalogue: Columns & Units                               -->
+    <!-- ------------------------------------------------------------------ -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingGalaxies">
+        <button class="accordion-button collapsed" type="button"
+                data-bs-toggle="collapse" data-bs-target="#collapseGalaxies"
+                aria-expanded="false" aria-controls="collapseGalaxies">
+          3. Galaxy (H&nbsp;I source) Catalogue: Columns, Units and Definitions
+        </button>
+      </h2>
+      <div id="collapseGalaxies" class="accordion-collapse collapse"
+           aria-labelledby="headingGalaxies" data-bs-parent="#helpAccordion">
+        <div class="accordion-body">
+
+          <p>
+            The MGCLS–H&nbsp;I galaxy catalogue is derived from automated 3-D
+            source finding applied to the H&nbsp;I cubes. Each row corresponds to
+            one detected H&nbsp;I source (typically a galaxy) and stores both basic
+            observables and morphological parameters.
+          </p>
+
+          <p><strong>Example entry (illustrative; values for a single galaxy in the Abell-3562 field):</strong></p>
+          <pre class="bg-light p-2 small">
+name                              id   ra [deg]   dec [deg]    v<sub>rad</sub> [km s⁻¹]   w<sub>50</sub> [km s⁻¹]   f_sum [Jy km s⁻¹]   ell_maj [pix]   ell_min [pix]
+MKTCS-HI J054528.05-252543.3      7    86.3669    -25.4287      8.06×10⁶                2.31×10²                1.04×10²            7.69            4.43
+          </pre>
+          <p class="small text-muted">
+            The exact values will differ in your catalogue. This row is provided only to
+            illustrate how to read the columns below.
+          </p>
+
+          <div class="table-responsive">
+            <table class="table table-sm table-striped align-middle">
+              <thead>
+                <tr>
+                  <th>Column</th>
+                  <th>Units</th>
+                  <th>Definition &amp; scientific usage</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <!-- Identification -->
+                <tr>
+                  <td><code>Galaxy name (name)</code></td>
+                  <td>–</td>
+                  <td>
+                    MGCLS–H&nbsp;I source identifier, usually of the form
+                    <code>MKTCS-HI JHHMMSS.ss±DDMMSS.s</code>, derived from the J2000
+                    sky position of the H&nbsp;I centroid. Use this as the primary ID
+                    when cross-matching with external catalogues.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>ID (id)</code></td>
+                  <td>–</td>
+                  <td>
+                    Internal integer source ID within the cube. Often used to build
+                    filenames for cubelets and diagnostic products.
+                  </td>
+                </tr>
+
+                <!-- Pixel-space positions & extents -->
+                <tr>
+                  <td>
+                    <code>x</code>, <code>y</code>, <code>z</code>
+                  </td>
+                  <td>pix</td>
+                  <td>
+                    Flux-weighted centroid of the source in pixel coordinates:
+                    <code>x</code> (RA direction), <code>y</code> (Dec direction) and
+                    <code>z</code> (spectral channel index). For most science work, users
+                    will instead use the corresponding world coordinates
+                    <code>ra</code>, <code>dec</code> and <code>v_rad</code>, but the
+                    pixel indices are useful if re-analysing the native cubes.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>x_min</code>, <code>x_max</code>,<br>
+                    <code>y_min</code>, <code>y_max</code>,<br>
+                    <code>z_min</code>, <code>z_max</code>
+                  </td>
+                  <td>pix</td>
+                  <td>
+                    Minimum and maximum pixel indices of the 3-D bounding box that
+                    contains the detected emission. This defines the region from which
+                    flux and morphological parameters are measured.
+                  </td>
+                </tr>
+
+                <!-- Fluxes, noise & statistics -->
+                <tr>
+                  <td>
+                    <code>S<sub>min</sub>, S<sub>max</sub> (f_min</code>, <code>f_max</code>),<br>
+                    <code>mean</code>, <code>std</code>, <code>rms</code>
+                  </td>
+                  <td>Jy&nbsp;beam<sup>−1</sup></td>
+                  <td>
+                    Basic statistics of the flux distribution inside the source mask.
+                    <code>f_min</code> and <code>f_max</code> are the minimum and maximum
+                    voxel values; <code>mean</code>, <code>std</code> and
+                    <code>rms</code> characterise the average brightness and noise level
+                    within the detected region. These are useful for sanity checks and
+                    for understanding how close the detection is to the noise floor.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>S<sub>int</sub> (f_sum)</code></td>
+                  <td>Jy&nbsp;km&nbsp;s<sup>−1</sup></td>
+                  <td>
+                    Integrated H&nbsp;I line flux over the full 3-D mask. This is the
+                    key observable used to estimate H&nbsp;I mass:
+                    <br>
+                    <div class="mt-1 mb-2" style="font-family: 'Times New Roman', serif;">
+                      <em>M</em><sub>HI</sub> ≈ 2.356 × 10<sup>5</sup>
+                      &nbsp; D<sup>2</sup> &nbsp; <em>F</em><sub>HI</sub>
+                      &nbsp;&nbsp; <em>M</em><sub>⊙</sub>,
+                    </div>
+                    where <em>F</em><sub>HI</sub> is the integrated line flux in
+                    Jy&nbsp;km&nbsp;s<sup>−1</sup> and <em>D</em> is the distance in Mpc
+                    (derived from redshift and cosmology).
+                  </td>
+                </tr>
+
+                <!-- Kinematics: velocities & widths -->
+                <tr>
+                  <td><code>V<sub>rad</sub> (v_rad)</code></td>
+                  <td>m&nbsp;s<sup>−1</sup></td>
+                  <td>
+                    Flux-weighted radial velocity of the source, usually in the same
+                    reference frame as the parent cube (e.g. barycentric, radio definition).
+                    For many applications you may wish to convert to km&nbsp;s<sup>−1</sup>
+                    and subtract the cluster systemic velocity to place the galaxy in
+                    phase–space.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>W<sub>20</sub> (w20)</code>, <code><code>W<sub>50</sub> (w50)</code>,<br>
+                    <code>wm50</code>
+                  </td>
+                  <td>m&nbsp;s<sup>−1</sup></td>
+                  <td>
+                    Global H&nbsp;I line widths measured at 20% and 50% of the peak, and a
+                    robust estimator around 50%. These are sensitive to the projected
+                    rotation velocity and can be used as inputs to Tully–Fisher analyses,
+                    dynamical mass estimates and to characterise disturbed profiles.
+                  </td>
+                </tr>
+
+                <!-- Shape & orientation -->
+                <tr>
+                  <td>
+                    <code>ell_maj</code>, <code>ell_min</code>,<br>
+                    <code>ell_pa</code>
+                  </td>
+                  <td>pix, deg</td>
+                  <td>
+                    Major and minor axis lengths and position angle (PA) of a 2-D ellipse
+                    fitted to the spatial H&nbsp;I distribution, usually measured from
+                    north through east. These parameters summarise the projected size and
+                    orientation of the source on the sky.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>ell3s_maj</code>, <code>ell3s_min</code>,<br>
+                    <code>ell3s_pa</code>
+                  </td>
+                  <td>pix, deg</td>
+                  <td>
+                    Ellipse parameters measured at a higher significance threshold
+                    (e.g. three-sigma isophote), providing a more conservative size
+                    estimate that is less sensitive to very low-level emission.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>kin_pa</code></td>
+                  <td>deg</td>
+                  <td>
+                    Estimated kinematic position angle of the rotating H&nbsp;I disk,
+                    where measurable. Comparing <code>kin_pa</code> to the morphological
+                    PA can reveal warps, lopsided disks or disturbed kinematics.
+                  </td>
+                </tr>
+
+                <!-- World coordinates & peak quantities -->
+                <tr>
+                  <td>Right Ascension, Declination (<code>ra</code>, <code>dec</code>)</td>
+                  <td>deg (J2000)</td>
+                  <td>
+                    Sky coordinates (RA, Dec) of the flux-weighted centroid of the
+                    detected H&nbsp;I emission, in decimal degrees (J2000). These
+                    columns are the recommended ones for cross-matching to optical/IR
+                    catalogues.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <code>ra_peak</code>, <code>dec_peak</code>,<br>
+                    <code>v_rad_peak</code>
+                  </td>
+                  <td>deg, deg, m&nbsp;s<sup>−1</sup></td>
+                  <td>
+                    World coordinates and velocity at the position of maximum H&nbsp;I
+                    brightness within the source mask. Useful for checking whether the
+                    brightest voxel coincides with the centroid and for exploring
+                    asymmetries.
+                  </td>
+                </tr>
+
+                <!-- Uncertainties -->
+                <tr>
+                  <td>
+                    <code>err_x</code>, <code>err_y</code>, <code>err_z</code>,<br>
+                    <code>err_f_sum</code>
+                  </td>
+                  <td>pix, pix, pix, Jy&nbsp;km&nbsp;s<sup>−1</sup></td>
+                  <td>
+                    Formal uncertainties on the centroid position in pixel units and on
+                    the integrated H&nbsp;I flux. These can be propagated into error
+                    budgets when estimating H&nbsp;I masses or when comparing to
+                    simulations and other surveys.
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-3">
+            In practice, many users will primarily work with
+            <code>name</code>, <code>ra</code>, <code>dec</code>,
+            <code>v_rad</code>, the line widths, <code>f_sum</code> and any derived
+            H&nbsp;I masses. The additional morphological and error terms are provided
+            for more detailed structural and kinematic analyses.
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- 4. Short Glossary of Frequently Used Symbols                       -->
+    <!-- ------------------------------------------------------------------ -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingGlossary">
+        <button class="accordion-button collapsed" type="button"
+                data-bs-toggle="collapse" data-bs-target="#collapseGlossary"
+                aria-expanded="false" aria-controls="collapseGlossary">
+          4. Glossary of Common Quantities
+        </button>
+      </h2>
+      <div id="collapseGlossary" class="accordion-collapse collapse"
+           aria-labelledby="headingGlossary" data-bs-parent="#helpAccordion">
+        <div class="accordion-body">
+
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><em>z</em></td>
+                <td>Redshift of the cluster or galaxy.</td>
+              </tr>
+              <tr>
+                <td><em>R</em><sub>200</sub></td>
+                <td>Radius where the mean enclosed density is 200× the critical density.</td>
+              </tr>
+              <tr>
+                <td><em>σ</em><sub>v</sub></td>
+                <td>1-D velocity dispersion of galaxies in the cluster.</td>
+              </tr>
+              <tr>
+                <td><em>N</em><sub>HI</sub></td>
+                <td>H&nbsp;I column density (atoms cm<sup>−2</sup>).</td>
+              </tr>
+              <tr>
+                <td><em>M</em><sub>HI</sub></td>
+                <td>Neutral hydrogen mass of a galaxy, in solar masses.</td>
+              </tr>
+              <tr>
+                <td><em>M</em><sub>⊙</sub></td>
+                <td>Solar mass.</td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <a href="{{ url_for('index') }}" class="btn btn-outline-secondary mt-4">← Back to Home</a>
+
+</div>
+{% endblock %}

@@ -1,0 +1,573 @@
+{% extends "layout.html" %} 
+{% block title %}Search · MGCLS–H I{% endblock %}
+
+{% block content %}
+
+<h1 class="mt-4">Search</h1>
+
+<form action="{{ url_for('search') }}" method="post" class="mb-4" id="searchForm">
+  <!-- Toggle -->
+  <div class="mb-3">
+    <label class="form-label"><strong>I want to search for:</strong></label><br>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="target_choice" id="targetClusters" value="clusters"
+             {% if target_choice != 'galaxies' %}checked{% endif %}>
+      <label class="form-check-label" for="targetClusters">Clusters</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="target_choice" id="targetGalaxies" value="galaxies"
+             {% if target_choice == 'galaxies' %}checked{% endif %}>
+      <label class="form-check-label" for="targetGalaxies">Galaxies</label>
+    </div>
+  </div>
+
+  <!-- ========================== CLUSTERS TAB ========================== -->
+  <div id="clusterBlocks" style="display: {% if target_choice != 'galaxies' %}block{% else %}none{% endif %};">
+    <!-- Names / IDs -->
+    <fieldset class="border rounded p-3 mb-3">
+      <legend class="float-none w-auto px-2 fs-6 mb-0">1) Names / IDs</legend>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Cluster ID (substring)</label>
+          <input type="text" class="form-control" name="name_query" value="{{ form.get('name_query','') }}" placeholder='e.g. "Abell", "J0600.8-5835"'>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">MGCLS_Name (substring)</label>
+          <input type="text" class="form-control" name="mgcls_query" value="{{ form.get('mgcls_query','') }}" placeholder='e.g. "j060048-583514"'>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">SBID</label>
+          <input type="text" class="form-control" name="sbid" value="{{ form.get('sbid','') }}">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Capture ID</label>
+          <input type="text" class="form-control" name="capture_id" value="{{ form.get('capture_id','') }}">
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Spatial -->
+    <fieldset class="border rounded p-3 mb-3">
+      <legend class="float-none w-auto px-2 fs-6 mb-0">2) Spatial (optional)</legend>
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">RA</label>
+          <input type="text" class="form-control" name="ra" value="{{ form.get('ra','') }}" placeholder='hh:mm:ss.s or deg'>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Dec</label>
+          <input type="text" class="form-control" name="dec" value="{{ form.get('dec','') }}" placeholder='dd:mm:ss.s or deg'>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Radius</label>
+          <div class="input-group">
+            <input type="text" class="form-control" name="radius" value="{{ form.get('radius','') }}" placeholder="e.g. 3">
+            <select class="form-select" name="radius_unit">
+              {% set ru = form.get('radius_unit','arcmin') %}
+              <option value="deg"    {% if ru=='deg' %}selected{% endif %}>deg</option>
+              <option value="arcmin" {% if ru=='arcmin' %}selected{% endif %}>arcmin</option>
+              <option value="arcsec" {% if ru=='arcsec' %}selected{% endif %}>arcsec</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <small class="text-muted">Leave blank to skip spatial filtering.</small>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Velocity -->
+    <fieldset class="border rounded p-3 mb-3">
+      <legend class="float-none w-auto px-2 fs-6 mb-0">3) Velocity window (optional)</legend>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Velocity (km/s): center ± tol</label>
+          <div class="input-group">
+            <span class="input-group-text">center</span>
+            <input type="text" class="form-control" name="vel_center" value="{{ form.get('vel_center','') }}">
+            <span class="input-group-text">±</span>
+            <input type="text" class="form-control" name="vel_tol" value="{{ form.get('vel_tol','') }}">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">OR min–max (km/s)</label>
+          <div class="input-group">
+            <span class="input-group-text">min</span>
+            <input type="text" class="form-control" name="vel_min" value="{{ form.get('vel_min','') }}">
+            <span class="input-group-text">max</span>
+            <input type="text" class="form-control" name="vel_max" value="{{ form.get('vel_max','') }}">
+          </div>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+  <!-- ========================== GALAXIES TAB ========================== -->
+  <div id="galaxyBlock" style="display: {% if target_choice == 'galaxies' %}block{% else %}none{% endif %};">
+    <fieldset class="border rounded p-3 mb-3">
+      <legend class="float-none w-auto px-2 fs-6 mb-0">1) Name and Cluster scope</legend>
+      <div class="row g-3 align-items-end">
+        <div class="col-md-6">
+          <label class="form-label">Galaxy name (substring)</label>
+          <input type="text" class="form-control" name="galaxy_name" value="{{ form.get('galaxy_name','') }}" placeholder='e.g. "MKTCS-HI J012620.68-011643.3"'>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Limit to clusters (optional)</label>
+          <select class="form-select" name="cluster_scope" multiple size="6">
+            {% set scope = form.get('cluster_scope','') %}
+            {% set chosen = scope.split(',') if scope else [] %}
+            {% for c in cluster_choices %}
+              <option value="{{ c }}" {% if c in chosen %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-text">Hold Ctrl/Cmd to select multiple. Leave empty to search all clusters.</div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="border rounded p-3 mb-3">
+      <legend class="float-none w-auto px-2 fs-6 mb-0">2) Spatial (optional)</legend>
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">RA</label>
+          <input type="text" class="form-control" name="g_ra" value="{{ form.get('g_ra','') }}" placeholder='hh:mm:ss.s or deg'>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Dec</label>
+          <input type="text" class="form-control" name="g_dec" value="{{ form.get('g_dec','') }}" placeholder='dd:mm:ss.s or deg'>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Radius</label>
+          <div class="input-group">
+            <input type="text" class="form-control" name="g_radius" value="{{ form.get('g_radius','') }}" placeholder="e.g. 2">
+            <select class="form-select" name="g_radius_unit">
+              {% set gru = form.get('g_radius_unit','arcmin') %}
+              <option value="deg"    {% if gru=='deg' %}selected{% endif %}>deg</option>
+              <option value="arcmin" {% if gru=='arcmin' %}selected{% endif %}>arcmin</option>
+              <option value="arcsec" {% if gru=='arcsec' %}selected{% endif %}>arcsec</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-3"><small class="text-muted">Leave blank to skip spatial filtering.</small></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="border rounded p-3 mb-3">
+      <legend class="float-none w-auto px-2 fs-6 mb-0">3) Velocity (optional)</legend>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Velocity (km/s): center ± tol</label>
+          <div class="input-group">
+            <span class="input-group-text">center</span>
+            <input type="text" class="form-control" name="g_vel_center" value="{{ form.get('g_vel_center','') }}">
+            <span class="input-group-text">±</span>
+            <input type="text" class="form-control" name="g_vel_tol" value="{{ form.get('g_vel_tol','') }}">
+          </div>
+        </div>
+        <div class="col-md-6 d-flex gap-2 align-items-end">
+          <button type="submit" class="btn btn-primary">Search</button>
+          <button type="reset" class="btn btn-outline-secondary" onclick="resetGalaxy()">Clear</button>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</form>
+
+<!-- ========================== Cluster results ========================== -->
+{% if target_choice != 'galaxies' and cluster_rows %}
+  <h3>Cluster Results</h3>
+  <div class="table-responsive">
+    <table class="table table-striped table-hover table-sm align-middle">
+      <thead class="table-light">
+        <tr>
+          {% for label in cluster_header_labels %}<th>{{ label }}</th>{% endfor %}
+          <th>Download</th>
+        </tr>
+        <tr>
+          {% for unit in cluster_header_units %}<th class="text-muted small">{{ unit }}</th>{% endfor %}
+          <th class="text-muted small"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in cluster_rows %}
+        <tr>
+          {% for v in r %}<td>{{ v }}</td>{% endfor %}
+          <td class="text-nowrap">
+            <a class="btn btn-sm btn-success"
+               href="{{ url_for('download_cluster', cluster=r[0]) }}">
+               Download ZIP
+            </a>
+            <button class="btn btn-sm btn-outline-secondary"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#cliCluster{{ loop.index0 }}"
+                    aria-expanded="false"
+                    aria-controls="cliCluster{{ loop.index0 }}">
+              CLI
+            </button>
+            <div class="collapse mt-2" id="cliCluster{{ loop.index0 }}">
+              <div class="border rounded p-2 bg-light">
+                <div class="small text-muted mb-1">Terminal:</div>
+                <pre class="mb-2"><code>wget -O "{{ r[0] }}_cluster_products.zip" "{{ url_for('download_cluster', cluster=r[0], _external=True) }}"</code></pre>
+                <pre class="mb-2"><code>curl -L -o "{{ r[0] }}_cluster_products.zip" "{{ url_for('download_cluster', cluster=r[0], _external=True) }}"</code></pre>
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if cluster_previews %}
+    <h4 class="mt-4">Previews</h4>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-body px-0">
+        <div class="cluster-preview-rail">
+          {% for p in cluster_previews %}
+            {% if p.preview %}
+              <figure class="cluster-preview-item m-0">
+                <img src="{{ p.preview }}" class="cluster-preview-img rounded border"
+                     alt="{{ p.cluster }} preview" loading="lazy">
+                <figcaption class="text-muted small mt-2 text-center">{{ p.cluster }}</figcaption>
+              </figure>
+            {% endif %}
+          {% endfor %}
+        </div>
+        <small class="text-muted d-block mt-2 px-3">Source: S3 Cluster-Figures</small>
+      </div>
+    </div>
+  {% endif %}
+{% endif %}
+
+
+
+<!-- ========================== Galaxy results ========================== -->
+{% if did_submit and target_choice == 'galaxies' and galaxy_rows %}
+  <h3>Galaxy Results</h3>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover table-sm align-middle">
+      <thead class="table-light">
+        <tr>
+          {% for label in galaxy_header_labels %}<th>{{ label|safe }}</th>{% endfor %}
+          <th>Download</th>
+        </tr>
+        <tr>
+          {% for unit in galaxy_header_units %}<th class="text-muted small">{{ unit }}</th>{% endfor %}
+          <th class="text-muted small"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in galaxy_rows %}
+        {% set meta = galaxy_row_meta[loop.index0] if galaxy_row_meta else {} %}
+        <tr>
+          {% for v in r %}<td>{{ v }}</td>{% endfor %}
+          <td class="text-nowrap">
+            <a class="btn btn-sm btn-success"
+               href="{{ url_for('download_galaxy', cluster=meta['cluster'], gid=meta['id']) }}">
+               Download ZIP
+            </a>
+            <button class="btn btn-sm btn-outline-secondary"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#cliGalaxy{{ loop.index0 }}"
+                    aria-expanded="false"
+                    aria-controls="cliGalaxy{{ loop.index0 }}">
+              CLI
+            </button>
+            {% set gname = meta['name'] if meta and meta['name'] else '' %}
+            {% set base_out = (gname|replace(' ', '_') ~ '_galaxy.zip') if gname else (meta['cluster'] ~ '_id' ~ meta['id'] ~ '-galaxy.zip') %}
+            <div class="collapse mt-2" id="cliGalaxy{{ loop.index0 }}">
+              <div class="border rounded p-2 bg-light">
+                <div class="small text-muted mb-1">Terminal:</div>
+                <pre class="mb-2"><code>wget -O "{{ base_out }}" "{{ url_for('download_galaxy', cluster=meta['cluster'], gid=meta['id'], _external=True) }}"</code></pre>
+                <pre class="mb-2"><code>curl -L -o "{{ base_out }}" "{{ url_for('download_galaxy', cluster=meta['cluster'], gid=meta['id'], _external=True) }}"</code></pre>
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if galaxy_previews %}
+    <h4 class="mt-4">Previews</h4>
+
+    <!-- Horizontal rail with larger thumbs -->
+    {% for p in galaxy_previews %}
+      <div class="card shadow-sm mb-4">
+        <div class="card-header fw-semibold">
+          {{ p.cluster }} — ID {{ p.id }}{% if p.name %} — {{ p.name }}{% endif %}
+        </div>
+
+        <div class="card-body px-0">
+          <div class="preview-rail">
+            {% if p.mom0 %}
+              <figure class="preview-item m-0">
+                <img src="{{ p.mom0 }}" class="preview-img rounded border" alt="mom0 preview" loading="lazy">
+                <figcaption class="text-muted small mt-1 px-1">Moment 0 (with optical fallback)</figcaption>
+              </figure>
+            {% endif %}
+            {% if p.mom1 %}
+              <figure class="preview-item m-0">
+                <img src="{{ p.mom1 }}" class="preview-img rounded border" alt="mom1 preview" loading="lazy">
+                <figcaption class="text-muted small mt-1 px-1">Moment 1</figcaption>
+              </figure>
+            {% endif %}
+            {% if p.mom2 %}
+              <figure class="preview-item m-0">
+                <img src="{{ p.mom2 }}" class="preview-img rounded border" alt="mom2 preview" loading="lazy">
+                <figcaption class="text-muted small mt-1 px-1">Moment 2</figcaption>
+              </figure>
+            {% endif %}
+            {% if p.spec %}
+              <figure class="preview-item m-0">
+                <img src="{{ p.spec }}" class="preview-img rounded border" alt="spectral preview" loading="lazy">
+                <figcaption class="text-muted small mt-1 px-1">Spectral profile</figcaption>
+              </figure>
+            {% endif %}
+
+            {% if not (p.mom0 or p.mom1 or p.mom2 or p.spec) %}
+              <div class="preview-item m-0 d-flex align-items-center text-muted px-3">
+                <em>No preview figures found for this detection.</em>
+              </div>
+            {% endif %}
+          </div>
+          <small class="text-muted d-block mt-2 px-3">Source: S3 Galaxy-Figures</small>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endif %}
+
+<style>
+  /* Bigger, horizontal preview rail (galaxies) */
+  .preview-rail {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: .5rem 1rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .preview-item { flex: 0 0 auto; }
+  .preview-img {
+    display: block;
+    height: 380px;           /* keep your existing figure size */
+    max-height: 52vh;
+    width: auto;
+  }
+
+  /* Soften table/previews spacing */
+  .table + h4 { margin-top: 1.25rem; }
+</style>
+
+<style>
+  /* Centered cluster preview, but not gigantic */
+  .cluster-preview-rail {
+    display: flex;
+    justify-content: center;      /* keep centered */
+    align-items: flex-start;
+    gap: 1rem;
+    padding: .5rem 1rem;
+    overflow-x: auto;             /* harmless if single image */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .cluster-preview-item { flex: 0 0 auto; }
+
+  /* Key constraints: never overflow the card, cap the height */
+  .cluster-preview-img {
+    max-width: 100%;              /* never wider than the card */
+    height: auto;                 /* keep aspect ratio */
+    max-height: 720px;            /* <= tweak this number to taste (e.g. 300–360) */
+    display: block;
+  }
+
+  /* Optional responsive nudges */
+  @media (max-width: 992px) { .cluster-preview-img { max-height: 300px; } }
+  @media (max-width: 576px) { .cluster-preview-img { max-height: 260px; } }
+</style>
+
+<style>
+  /* Center the entire galaxy preview strip and the images inside it */
+  .preview-rail {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: .5rem 1rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+
+    /* NEW: center the set when it fits; scroll if it overflows */
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  /* Center each figure’s contents */
+  .preview-item {
+    flex: 0 0 auto;
+    text-align: center;          /* center figcaption too */
+  }
+  .preview-img {
+    display: block;
+    margin-left: auto;           /* center the image within figure */
+    margin-right: auto;
+    height: 380px;               /* keep your current size */
+    max-height: 52vh;            /* keep sensible on small screens */
+    width: auto;                 /* preserve aspect ratio */
+    object-fit: contain;         /* safety if any odd aspect slips in */
+    max-width: 100%;             /* don’t overflow the card on narrow viewports */
+  }
+
+  /* Gentle responsive nudges; keep the same “look”, just avoid overflow */
+  @media (max-width: 992px) { .preview-img { height: 340px; } }
+  @media (max-width: 576px) { .preview-img { height: 300px; } }
+</style>
+
+<style>
+  #imgLightbox .modal-content { box-shadow: 0 0 24px rgba(0,0,0,.5); }
+</style>
+
+
+<!-- Image Lightbox -->
+<div class="modal fade" id="imgLightbox" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content bg-dark border-0">
+      <div class="modal-body p-0">
+        <img id="lightboxImg"
+             src=""
+             alt=""
+             class="d-block mx-auto w-100 h-auto"
+             style="max-height:90vh; object-fit:contain;">
+      </div>
+      <div class="modal-footer justify-content-between">
+        <small class="text-white-50" id="lightboxCaption"></small>
+        <div class="d-flex gap-2">
+          <a id="lbDownload" class="btn btn-sm btn-outline-light" download>Download</a>
+          <button id="lbCopyBtn" type="button" class="btn btn-sm btn-outline-light">Copy image</button>
+          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %} {# CLOSES block content #}
+
+{% block scripts %}
+<script>
+  function toggleTarget() {
+    const isGal = document.getElementById('targetGalaxies').checked;
+    document.getElementById('clusterBlocks').style.display = isGal ? 'none' : 'block';
+    document.getElementById('galaxyBlock').style.display   = isGal ? 'block' : 'none';
+  }
+  const c = document.getElementById('targetClusters');
+  const g = document.getElementById('targetGalaxies');
+  if (c) c.addEventListener('change', toggleTarget);
+  if (g) g.addEventListener('change', toggleTarget);
+  toggleTarget();
+
+  function resetGalaxy() {
+    const f = document.getElementById('searchForm');
+    if (!f) return;
+    ['galaxy_name','g_ra','g_dec','g_radius','g_vel_center','g_vel_tol'].forEach(n => {
+      const el = f.querySelector(`[name="${n}"]`);
+      if (el) el.value = "";
+    });
+    const scope = f.querySelector('select[name="cluster_scope"]');
+    if (scope) Array.from(scope.options).forEach(o => o.selected = false);
+  }
+
+  // Reuse existing preview classes:
+  //  - galaxy: .preview-img
+  //  - cluster (new centered block): .cluster-preview-img
+  //  - cluster (grid cards): .card-img-top
+  (function () {
+    const modalEl   = document.getElementById('imgLightbox');
+    const modal     = new bootstrap.Modal(modalEl);
+    const imgEl     = document.getElementById('lightboxImg');
+    const capEl     = document.getElementById('lightboxCaption');
+    const dlEl      = document.getElementById('lbDownload');
+    const copyBtn   = document.getElementById('lbCopyBtn');
+
+    function filenameFromURL(url) {
+      try {
+        const u = new URL(url, window.location.href);
+        return u.pathname.split('/').pop() || 'image.png';
+      } catch {
+        return 'image.png';
+      }
+    }
+
+    // Delegate clicks from the whole page; match our preview classes
+    document.addEventListener('click', (ev) => {
+      const t = ev.target;
+      if (!t) return;
+
+      const isPreview =
+        t.classList.contains('preview-img') ||
+        t.classList.contains('cluster-preview-img') ||
+        t.classList.contains('card-img-top');
+
+      if (!isPreview) return;
+
+      ev.preventDefault();
+
+      // Prefer data-full if you ever add it; otherwise use current src
+      const src     = t.getAttribute('data-full') || t.getAttribute('src');
+      const caption =
+        t.getAttribute('alt')?.trim() ||
+        t.closest('.card')?.querySelector('.card-header')?.textContent?.trim() ||
+        t.closest('.card-body')?.querySelector('.small.fw-semibold')?.textContent?.trim() ||
+        '';
+
+      imgEl.src = src;
+      imgEl.alt = caption || 'Preview';
+      capEl.textContent = caption;
+      dlEl.href = src;
+      dlEl.download = filenameFromURL(src);
+
+      modal.show();
+    });
+
+    // Copy image to clipboard (falls back to copying the URL)
+    copyBtn.addEventListener('click', async () => {
+      try {
+        const res  = await fetch(imgEl.src, {mode:'cors'});
+        const blob = await res.blob();
+        if (navigator.clipboard && window.ClipboardItem) {
+          await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+        } else {
+          // Fallback: copy URL
+          await navigator.clipboard.writeText(imgEl.src);
+        }
+        copyBtn.classList.remove('btn-outline-light');
+        copyBtn.classList.add('btn-success');
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          copyBtn.classList.add('btn-outline-light');
+          copyBtn.classList.remove('btn-success');
+          copyBtn.textContent = 'Copy image';
+        }, 1200);
+      } catch (e) {
+        console.warn('Copy failed:', e);
+        alert('Could not copy image. You can still right-click → Save image as…');
+      }
+    });
+
+    // Clear image when hidden (helps memory on big images)
+    modalEl.addEventListener('hidden.bs.modal', () => {
+      imgEl.src = '';
+      capEl.textContent = '';
+    });
+  })();
+</script>
+{% endblock %}
