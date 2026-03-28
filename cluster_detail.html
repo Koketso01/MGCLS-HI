@@ -9,22 +9,52 @@
     <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('index') }}">← Back to Home</a>
   </div>
 
-  <!-- ============ Cluster figure ============ -->
+  <!-- ============ Cluster previews ============ -->
   <div class="card shadow-sm mb-3">
-    <div class="card-body p-2">
-      <div class="cluster-figure-wrap">
-        {% set img_url = fig_url or '' %}
-        <img id="cluster-figure"
-             src="{{ img_url }}"
-             alt="{{ cluster_id }}_Intensity_SNR.png"
-             class="img-fluid rounded"
-             onerror="handleNoFigure()">
-
-        <div id="cluster-figure-fallback" class="figure-fallback d-none">
-          <div class="fallback-text">No cluster figure</div>
-        </div>
+    <div class="card-body p-3">
+      {% set cp = previews if previews is defined and previews else {} %}
+      <div class="row g-2 justify-content-center preview-grid">
+        {% if cp.intensity %}
+          <div class="col-12 col-lg-4">
+            <figure class="m-0 text-center bg-white">
+              <img src="{{ cp.intensity }}"
+                   alt="{{ cluster_id }} intensity map"
+                   class="img-fluid rounded border cluster-preview-img preview-openable" role="button" title="Click to enlarge"
+                   loading="lazy">
+              <figcaption class="text-muted small mt-2">Intensity map</figcaption>
+            </figure>
+          </div>
+        {% endif %}
+        {% if cp.noise %}
+          <div class="col-12 col-lg-4">
+            <figure class="m-0 text-center bg-white">
+              <img src="{{ cp.noise }}"
+                   alt="{{ cluster_id }} noise footprints"
+                   class="img-fluid rounded border cluster-preview-img preview-openable" role="button" title="Click to enlarge"
+                   loading="lazy">
+              <figcaption class="text-muted small mt-2">Noise footprints</figcaption>
+            </figure>
+          </div>
+        {% endif %}
+        {% if cp.completeness %}
+          <div class="col-12 col-lg-4">
+            <figure class="m-0 text-center bg-white">
+              <img src="{{ cp.completeness }}"
+                   alt="{{ cluster_id }} completeness"
+                   class="img-fluid rounded border cluster-preview-img preview-openable" role="button" title="Click to enlarge"
+                   loading="lazy">
+              <figcaption class="text-muted small mt-2">Completeness</figcaption>
+            </figure>
+          </div>
+        {% endif %}
+        {% if not (cp.intensity or cp.noise or cp.completeness) %}
+          <div class="col-12">
+            <div class="cluster-figure-wrap d-flex align-items-center justify-content-center">
+              <div class="fallback-text">No cluster preview figures found.</div>
+            </div>
+          </div>
+        {% endif %}
       </div>
-      <small class="text-muted d-block mt-2">Source: S3 Cluster-Figures</small>
     </div>
   </div>
 
@@ -32,44 +62,29 @@
   <div class="card shadow-sm mb-4">
     <div class="card-body d-flex flex-wrap gap-2 align-items-center">
       <!-- Cluster bundle -->
-      <a class="btn btn-success"
-         href="{{ url_for('download_cluster', cluster=cluster_id) }}">
-        Download cluster bundle (ZIP)
+      <a class="btn btn-outline-secondary"
+         href="{{ url_for('download_cluster', cluster=cluster_id) }}#cli-workflows">
+        Cluster bundle CLI
       </a>
-      <button class="btn btn-outline-secondary"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#cliClusterBundle"
-              aria-expanded="false"
-              aria-controls="cliClusterBundle">
-        CLI
-      </button>
-      <div class="collapse w-100" id="cliClusterBundle">
-        <div class="border rounded p-2 bg-light mt-2">
-          <div class="small text-muted mb-1">Terminal:</div>
-          <pre class="mb-2"><code>wget -O "{{ cluster_id }}_cluster_products.zip" "{{ url_for('download_cluster', cluster=cluster_id, _external=True) }}"</code></pre>
-          <pre class="mb-2"><code>curl -L -o "{{ cluster_id }}_cluster_products.zip" "{{ url_for('download_cluster', cluster=cluster_id, _external=True) }}"</code></pre>
-        </div>
-      </div>
 
       <!-- All galaxies bundle -->
-      <a class="btn btn-primary ms-0 ms-sm-2"
-         href="{{ url_for('download_all_galaxies', cluster=cluster_id) }}">
-        Download all galaxies (ZIP)
-      </a>
-      <button class="btn btn-outline-secondary"
+      <button class="btn btn-outline-secondary ms-0 ms-sm-2"
               type="button"
               data-bs-toggle="collapse"
               data-bs-target="#cliAllGalaxies"
               aria-expanded="false"
               aria-controls="cliAllGalaxies">
-        CLI
+        All galaxies CLI
       </button>
       <div class="collapse w-100" id="cliAllGalaxies">
-        <div class="border rounded p-2 bg-light mt-2">
-          <div class="small text-muted mb-1">Terminal:</div>
-          <pre class="mb-2"><code>wget -O "{{ cluster_id }}_all_galaxies.zip" "{{ url_for('download_all_galaxies', cluster=cluster_id, _external=True) }}"</code></pre>
-          <pre class="mb-2"><code>curl -L -o "{{ cluster_id }}_all_galaxies.zip" "{{ url_for('download_all_galaxies', cluster=cluster_id, _external=True) }}"</code></pre>
+        <div class="border rounded p-3 bg-light mt-2">
+          <div class="small text-muted mb-2">Use the same command-line workflow for all galaxies in this cluster.</div>
+          <div class="d-flex flex-wrap gap-2 mb-2">
+            <a class="btn btn-sm btn-outline-secondary" href="{{ all_galaxies_download_page }}">Open full CLI workflow</a>
+          </div>
+          <div class="small text-muted mb-1">Quick commands:</div>
+          <pre class="mb-2"><code>wget -O "{{ cluster_id }}_all_galaxies_download.sh" "{{ all_galaxies_script_url }}" &amp;&amp; bash "{{ cluster_id }}_all_galaxies_download.sh"</code></pre>
+          <pre class="mb-0"><code>curl -L "{{ all_galaxies_script_url }}" -o "{{ cluster_id }}_all_galaxies_download.sh" &amp;&amp; bash "{{ cluster_id }}_all_galaxies_download.sh"</code></pre>
         </div>
       </div>
     </div>
@@ -91,13 +106,13 @@
           <th>Download</th>
         </tr>
         <tr class="units-row">
-          <th class="text-muted small"></th>
-          <th class="text-muted small">HH:MM:SS.S</th>
-          <th class="text-muted small">DD:MM:SS.S</th>
-          <th class="text-muted small">km/s</th>
-          <th class="text-muted small"></th>
-          <th class="text-muted small">km/s</th>
-          <th class="text-muted small">km/s</th>
+          <th class="text-muted small">MKTCS-HI JHHMMSS.ss±DDMMSS.s</th>
+          <th class="text-muted small">[HH:MM:SS.ss]</th>
+          <th class="text-muted small">[±DD:MM:SS.ss]</th>
+          <th class="text-muted small">[km/s]</th>
+          <th class="text-muted small">[Jy km/s]</th>
+          <th class="text-muted small">[km/s]</th>
+          <th class="text-muted small">[km/s]</th>
           <th class="text-muted small"></th>
         </tr>
       </thead>
@@ -117,25 +132,10 @@
               <td>{{ g.w20 }}</td>
               <td>{{ g.w50 }}</td>
               <td class="text-nowrap">
-                <a class="btn btn-sm btn-success"
-                   href="{{ url_for('download_galaxy', cluster=cluster_id, gid=gid) }}">
-                  ZIP
-                </a>
-                <button class="btn btn-sm btn-outline-secondary"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#cliGal{{ loop.index0 }}"
-                        aria-expanded="false"
-                        aria-controls="cliGal{{ loop.index0 }}">
+                <a class="btn btn-sm btn-outline-secondary"
+                   href="{{ url_for('download_galaxy', cluster=cluster_id, gid=gid) }}#cli-workflows">
                   CLI
-                </button>
-                <div class="collapse mt-2" id="cliGal{{ loop.index0 }}">
-                  <div class="border rounded p-2 bg-light">
-                    <div class="small text-muted mb-1">Terminal:</div>
-                    <pre class="mb-2"><code>wget -O "{{ outname }}" "{{ url_for('download_galaxy', cluster=cluster_id, gid=gid, _external=True) }}"</code></pre>
-                    <pre class="mb-2"><code>curl -L -o "{{ outname }}" "{{ url_for('download_galaxy', cluster=cluster_id, gid=gid, _external=True) }}"</code></pre>
-                  </div>
-                </div>
+                </a>
               </td>
             </tr>
           {% endfor %}
@@ -150,6 +150,30 @@
     </table>
   </div>
 </div>
+
+<!-- Image Lightbox -->
+<div class="modal fade" id="imgLightbox" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content bg-dark border-0">
+      <div class="modal-body p-0">
+        <img id="lightboxImg"
+             src=""
+             alt=""
+             class="d-block mx-auto w-100 h-auto"
+             style="max-height:90vh; object-fit:contain;">
+      </div>
+      <div class="modal-footer justify-content-between">
+        <div id="lightboxCaption" class="text-light small text-start"></div>
+        <div class="d-flex gap-2">
+          <a id="lbDownload" class="btn btn-sm btn-outline-light" download>Download</a>
+          <button id="lbCopyBtn" type="button" class="btn btn-sm btn-outline-light">Copy image</button>
+          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <style>
   /* Subtle styling for the units row */
@@ -181,14 +205,111 @@
     opacity: .9;
   }
   .d-none { display: none !important; }
+  .preview-grid { align-items: stretch; }
+  .preview-grid > [class*="col-"] { display: flex; }
+  .preview-grid figure {
+    width: 100%;
+    margin: 0;
+    padding: .35rem;
+    border-radius: .65rem;
+    background: #fff;
+  }
+  .cluster-preview-img {
+    display: block;
+    width: 100%;
+    height: min(33vw, 440px);
+    min-height: 280px;
+    max-height: 440px;
+    margin-inline: auto;
+    object-fit: contain;
+    background: transparent;
+    cursor: zoom-in;
+  }
+  #imgLightbox .modal-content { box-shadow: 0 0 24px rgba(0,0,0,.5); }
+  @media (max-width: 991.98px) {
+    .cluster-preview-img { height: min(52vw, 360px); max-height: 360px; }
+  }
+  @media (max-width: 575.98px) {
+    .cluster-preview-img { height: min(72vw, 300px); min-height: 220px; max-height: 300px; }
+  }
 </style>
 
+{% endblock %}
+
+{% block scripts %}
 <script>
-  function handleNoFigure() {
-    const img = document.getElementById('cluster-figure');
-    if (img) img.classList.add('d-none');
-    const fb = document.getElementById('cluster-figure-fallback');
-    if (fb) fb.classList.remove('d-none');
+  function filenameFromURL(url) {
+    try {
+      const u = new URL(url, window.location.href);
+      return u.pathname.split('/').pop() || 'image.png';
+    } catch {
+      return 'image.png';
+    }
+  }
+
+  function initClusterPreviewLightbox() {
+    const modalEl = document.getElementById('imgLightbox');
+    if (!modalEl || typeof bootstrap === 'undefined') return;
+
+    const imgEl   = document.getElementById('lightboxImg');
+    const capEl   = document.getElementById('lightboxCaption');
+    const dlEl    = document.getElementById('lbDownload');
+    const copyBtn = document.getElementById('lbCopyBtn');
+    if (!imgEl || !capEl || !dlEl || !copyBtn) return;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+    document.addEventListener('click', (ev) => {
+      const t = ev.target;
+      if (!t || !t.classList || !(t.classList.contains('cluster-preview-img') || t.classList.contains('preview-openable'))) return;
+      ev.preventDefault();
+
+      const src = t.getAttribute('data-full') || t.getAttribute('src');
+      const caption = t.getAttribute('alt')?.trim() || t.closest('figure')?.querySelector('figcaption')?.textContent?.trim() || '';
+      if (!src) return;
+
+      imgEl.src = src;
+      imgEl.alt = caption || 'Preview';
+      capEl.textContent = caption;
+      dlEl.href = src;
+      dlEl.download = filenameFromURL(src);
+      modal.show();
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      const original = copyBtn.textContent;
+      try {
+        const res = await fetch(imgEl.src, { mode: 'cors' });
+        const blob = await res.blob();
+        if (navigator.clipboard && window.ClipboardItem) {
+          await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+        } else {
+          await navigator.clipboard.writeText(imgEl.src);
+        }
+        copyBtn.classList.remove('btn-outline-light');
+        copyBtn.classList.add('btn-success');
+        copyBtn.textContent = '✓ Copied';
+        setTimeout(() => {
+          copyBtn.classList.add('btn-outline-light');
+          copyBtn.classList.remove('btn-success');
+          copyBtn.textContent = original;
+        }, 1400);
+      } catch (e) {
+        console.warn('Copy failed:', e);
+        alert('Could not copy image. You can still right-click → Save image as…');
+      }
+    });
+
+    modalEl.addEventListener('hidden.bs.modal', () => {
+      imgEl.src = '';
+      capEl.textContent = '';
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initClusterPreviewLightbox);
+  } else {
+    initClusterPreviewLightbox();
   }
 </script>
 {% endblock %}

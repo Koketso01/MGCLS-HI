@@ -21,132 +21,59 @@
   <div class="container-fluid wide-wrap px-0">
     <div class="row g-4 align-items-start">
 
-      <!-- Left: science summary -->
-      <div class="col-12 col-lg-8">
-        <div class="bg-white rounded-3 shadow-sm p-4">
-          <h1 class="mb-3 text-center" style="color: #4a148c;">
+      <div class="col-12">
+        <div class="bg-white rounded-3 shadow-sm p-4 p-lg-5">
+          <h1 class="mb-4 text-center" style="color: #4a148c;">
             Welcome to MGCLS–H&nbsp;I (DR1)
           </h1>
 
-          <p>
-            The MGCLS–H&nbsp;I database is the dedicated neutral hydrogen (H&nbsp;I) companion to the
-            <a href="https://mgcls.sarao.ac.za/" target="_blank" rel="noopener" style="color: #0d6efd;">
-              MeerKAT Galaxy Cluster Legacy Survey (MGCLS)
-            </a>.
-            It assembles a homogeneous view of H&nbsp;I in galaxies spanning environments from
-            massive clusters to groups over the redshift range
-            <span class="fw-semibold">0 &lt; z &lesssim; {{ hi_stats.z_max }}</span>.
-          </p>
+          <div class="landing-intro-copy">
+            <p>
+              The MGCLS–H&nbsp;I database is the dedicated neutral hydrogen (H&nbsp;I) companion to the
+              <a href="https://mgcls.sarao.ac.za/" target="_blank" rel="noopener" style="color: #0d6efd;">
+                MeerKAT Galaxy Cluster Legacy Survey (MGCLS)
+              </a>, bringing together a homogeneous view of H&nbsp;I in galaxies from groups to massive clusters.
+              In this first release, the database stages <span class="fw-semibold">{{ hi_stats.num_clusters }}</span>
+              H&nbsp;I cluster fields and <span class="fw-semibold">{{ hi_stats.num_galaxies }}</span> H&nbsp;I-detected
+              galaxies across the redshift range <span class="fw-semibold">0 &lt; z &lesssim; {{ hi_stats.z_max }}</span>.
+            </p>
 
-          <p>
-            All fields are processed through a single end-to-end workflow: spectral-line calibration
-            and imaging with
-            <a href="https://caracal.readthedocs.io/en/latest/" target="_blank" rel="noopener" style="color: #0d6efd;">
-              CARACal
-            </a>,
-            H&nbsp;I source detection with
-            <a href="https://gitlab.com/SoFiA-Admin/SoFiA-2" target="_blank" rel="noopener" style="color: #0d6efd;">
-              SoFiA-2
-            </a>
-            (and completeness tests with
-            <a href="https://editeodoro.github.io/Bbarolo/" target="_blank" rel="noopener" style="color: #0d6efd;">
-              3D-Barolo
-            </a>),
-            and quality assessment before staging into this database. This avoids the mixed
-            sensitivities, resolutions and selection functions that complicate the comparison of
-            legacy H&nbsp;I surveys.
-          </p>
+            <p>
+              All fields are processed through one consistent end-to-end workflow, with spectral-line calibration
+              and imaging carried out with
+              <a href="https://caracal.readthedocs.io/en/latest/" target="_blank" rel="noopener" style="color: #0d6efd;">
+                CARACal
+              </a>, source finding performed with
+              <a href="https://gitlab.com/SoFiA-Admin/SoFiA-2" target="_blank" rel="noopener" style="color: #0d6efd;">
+                SoFiA-2
+              </a>, and completeness testing supported by
+              <a href="https://editeodoro.github.io/Bbarolo/" target="_blank" rel="noopener" style="color: #0d6efd;">
+                3D-Barolo
+              </a>. This uniform processing helps avoid the mixed sensitivities, resolutions and selection effects
+              that often complicate comparisons across legacy H&nbsp;I surveys.
+            </p>
 
-          <p>
-            The database provides a uniform interferometric view of H&nbsp;I over
-            <span class="fw-semibold">{{ hi_stats.v_min }}–{{ hi_stats.v_max }}&nbsp;km/s</span>
-            (corresponding to ≈{{ hi_stats.f_min }}–{{ hi_stats.f_max }}&nbsp;MHz) with typical
-            column-density sensitivities down to
-            <span class="fw-semibold">
-              N<sub>HI</sub> ≈ {{ hi_stats.nhi_min_html|safe }}&nbsp;cm⁻²
-            </span>
-            (1σ, field dependent).
-          </p>
+            <p>
+              The released data provide a uniform interferometric view of H&nbsp;I over
+              <span class="fw-semibold">{{ hi_stats.v_min }}–{{ hi_stats.v_max }}&nbsp;km/s</span>, corresponding to
+              approximately <span class="fw-semibold">{{ hi_stats.f_min }}–{{ hi_stats.f_max }}&nbsp;MHz</span>, with
+              typical image rms values of <span class="fw-semibold">{{ hi_stats.rms_min_mjy }}–{{ hi_stats.rms_max_mjy }} mJy/beam</span>,
+              column-density sensitivities reaching about
+              <span class="fw-semibold">{{ hi_stats.nhi_min_html|safe }}–{{ hi_stats.nhi_max_html|safe }}&nbsp;cm⁻²</span>,
+              angular resolutions of <span class="fw-semibold">{{ hi_stats.beam_min }}–{{ hi_stats.beam_max }} arcsec</span>,
+              and dynamical cluster halo masses spanning
+              <span class="fw-semibold">{{ hi_stats.mass_min_html|safe }}–{{ hi_stats.mass_max_html|safe }} M☉</span>.
+            </p>
 
-          <p class="mb-0">
-            Whether the focus is gas stripping, environmental quenching, scaling relations or
-            benchmarking simulations, the aim is to provide a clean, homogeneous sample for robust
-            statistical and spatially resolved H&nbsp;I science. Think of it as the
-            <span class="fw-semibold">“gas-physics layer” of MGCLS</span>, packaged for fast
-            browsing, easy download and real science.
-          </p>
-        </div>
-      </div>
-
-      <!-- Right: at-a-glance summary with dynamic numbers -->
-      <div class="col-12 col-lg-4">
-        <div class="bg-white rounded-3 shadow-sm p-4 h-100">
-          <h2 class="hi-glance-title mb-3">
-            MGCLS–H&nbsp;I at a Glance
-          </h2>
-
-          <ul class="list-unstyled mb-3">
-            <li class="mb-1">
-              <span class="fw-semibold">Number of H&nbsp;I clusters staged:</span>
-              {{ hi_stats.num_clusters }}
-            </li>
-            <li class="mb-1">
-              <span class="fw-semibold">Number of H&nbsp;I-detected galaxies staged:</span>
-              {{ hi_stats.num_galaxies }}
-            </li>
-            <li class="mb-1">
-              <span class="fw-semibold">Redshift coverage:</span>
-              0 &lt; z &lesssim; {{ hi_stats.z_max }}
-            </li>
-            <li class="mb-1">
-              <span class="fw-semibold">Velocity coverage:</span>
-              {{ hi_stats.v_min }}–{{ hi_stats.v_max }} km/s
-            </li>
-            <li class="mb-1">
-              <span class="fw-semibold">Frequency coverage:</span>
-              {{ hi_stats.f_min }}–{{ hi_stats.f_max }} MHz
-            </li>
-          </ul>
-
-          <!-- Depth & Resolution as a bulleted list -->
-          <p class="data-products-intro mt-3 mb-2 fw-semibold">
-            Depth &amp; Resolution
-          </p>
-          <ul class="mb-3 data-products-list">
-            <li class="mb-1">
-              Image rms (1σ): {{ hi_stats.rms_min_mjy }}–{{ hi_stats.rms_max_mjy }} mJy/beam
-            </li>
-            <li class="mb-1">
-              H&nbsp;I column density: ≈ {{ hi_stats.nhi_min_html|safe }}–{{ hi_stats.nhi_max_html|safe }} cm⁻²
-            </li>
-            <li class="mb-1">
-              Angular resolution: {{ hi_stats.beam_min }}–{{ hi_stats.beam_max }} arcsec
-            </li>
-            <li class="mb-1">
-              Dynamical cluster halo masses:
-              {{ hi_stats.mass_min_html|safe }}–{{ hi_stats.mass_max_html|safe }} M☉
-            </li>
-          </ul>
-
-
-
-
-          <p class="data-products-intro mt-3 mb-2 fw-semibold">
-            This first MGCLS–H&nbsp;I release provides the following science-ready data products:
-          </p>
-          <ul class="mb-3 data-products-list">
-            <li class="mb-1">H&nbsp;I source catalogues (per cluster)</li>
-            <li class="mb-1">Moment maps and velocity fields (per cluster)</li>
-            <li class="mb-1">H&nbsp;I cubelets for each detected galaxy</li>
-            <li class="mb-1">Signal-to-noise, mask and diagnostic products</li>
-            <li class="mb-1">Multi-wavelength preview figures for each cluster</li>
-          </ul>
-
-          <p class="small mb-0">
-            Hosted at Rhodes University and supported by the NRF–SARAO and partner institutions.
-            The front-end is static and serverless; users only pay the cost of viewing and
-            downloading the products they need.
-          </p>
+            <p class="mb-0">
+              The database is designed for fast scientific use, whether the goal is to study gas stripping,
+              environmental quenching, scaling relations, or to benchmark simulations. This release includes
+              science-ready H&nbsp;I source catalogues, cluster-level moment maps and velocity fields, per-galaxy
+              H&nbsp;I cubelets, signal-to-noise and mask products, and multi-wavelength preview figures. Hosted at
+              Rhodes University with support from NRF–SARAO and partner institutions, the site is intended as a
+              clean, browsable and downloadable H&nbsp;I layer for the broader MGCLS legacy.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -242,6 +169,10 @@
 </div>
 
 <style>
+  .landing-intro-copy p + p {
+    margin-top: 1.25rem;
+  }
+
   /* Visual cue for clickable rows */
   tr.click-row { cursor: pointer; }
   tr.click-row:hover { background-color: rgba(13,110,253,.06); }

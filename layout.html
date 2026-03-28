@@ -6,7 +6,31 @@
     name="viewport"
     content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+  {% set page_title_text = self.title()|striptags|trim %}
+  {% set canonical_url = request.base_url %}
+
   <title>{% block title %}MGCLS–H I{% endblock %}</title>
+
+  <meta name="description" content="{{ SEO_DESCRIPTION }}">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="theme-color" content="#0b1220">
+  <link rel="canonical" href="{{ canonical_url }}">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ FAVICON_IMG }}">
+  <link rel="icon" type="image/png" sizes="192x192" href="{{ FAVICON_IMG }}">
+  <link rel="apple-touch-icon" href="{{ FAVICON_IMG }}">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MGCLS–H I">
+  <meta property="og:title" content="{{ page_title_text }}">
+  <meta property="og:description" content="{{ SEO_DESCRIPTION }}">
+  <meta property="og:url" content="{{ canonical_url }}">
+  <meta property="og:image" content="{{ FAVICON_IMG }}">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ page_title_text }}">
+  <meta name="twitter:description" content="{{ SEO_DESCRIPTION }}">
+  <meta name="twitter:image" content="{{ FAVICON_IMG }}">
 
   <!-- Bootstrap 5 CSS -->
   <link
@@ -21,13 +45,6 @@
     rel="stylesheet">
 
   {# Navbar & figure bases #}
-  {% set NAVBAR_IMG = NAVBAR_IMG
-    or "https://ratt-public-data.s3.af-south-1.amazonaws.com/MGCLS_HI/Datasets/koketso-HI-MGCLS-data/HI-MGCLS/navbar_figures/navbar_image.png" %}
-  {% set LOGO_IMG = LOGO_IMG
-    or "https://ratt-public-data.s3.af-south-1.amazonaws.com/MGCLS_HI/Datasets/koketso-HI-MGCLS-data/HI-MGCLS/navbar_figures/logo.png" %}
-
-  {% set CLUSTER_FIG_BASE = "https://ratt-public-data.s3.af-south-1.amazonaws.com/MGCLS_HI/Datasets/koketso-HI-MGCLS-data/HI-MGCLS/Cluster-Figures" %}
-  {% set FOOTER_BASE = "https://ratt-public-data.s3.af-south-1.amazonaws.com/MGCLS_HI/Datasets/koketso-HI-MGCLS-data/HI-MGCLS/FooterFigures" %}
 
   <style>
     /* Layout to keep footer at the very bottom */
@@ -93,7 +110,7 @@
       position: relative;
       padding-top: 1.5rem;
       padding-bottom: 1.5rem;
-      background-image: url("https://ratt-public-data.s3.af-south-1.amazonaws.com/MGCLS_HI/Datasets/koketso-HI-MGCLS-data/HI-MGCLS/OtherFigures/noise_background.png");
+      background-image: url("{{ HERO_BG_IMG }}");
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -348,6 +365,22 @@
     }
     
 
+
+
+    @media (max-width: 767.98px) {
+      main { font-size: 1.08rem; }
+      main h1 { font-size: 1.7rem; }
+      main h2 { font-size: 1.45rem; }
+      main h3 { font-size: 1.25rem; }
+      main h4,
+      main h5,
+      main h6 { font-size: 1.12rem; }
+      main > .container-fluid { padding-left: 0.9rem !important; padding-right: 0.9rem !important; }
+      .site-footer .btn { width: 100%; justify-content: center; }
+      .supported-logos { justify-content: center; }
+      .site-footer iframe { min-height: 160px; }
+    }
+
   </style>
 
   <style>
@@ -528,9 +561,9 @@
           multi-wavelength preview figures from the MeerKAT Galaxy Cluster Legacy Survey.
         </p>
         <p class="mb-0 small">
-          Our serverless, static front-end is hosted on AWS S3 and supported by SARAO, the MGCLS team,
-          RATT, Rhodes University, AWS and the SoFiA-2 community — you only use bandwidth and compute
-          when you browse or download data products.
+          Our cloud-hosted front-end is supported by SARAO, the MGCLS team, RATT, Rhodes University,
+          AWS and the SoFiA-2 community — you only use bandwidth and compute when you browse or
+          download data products.
         </p>
       </div>
 
@@ -563,14 +596,6 @@
              class="me-3 d-inline-flex align-items-center"
              aria-label="Call MGCLS-HI Team">
             <i class="bi bi-telephone-fill me-1"></i>
-            <span>MGCLS-HI Team</span>
-          </a>
-          <a href="https://wa.me/2771557686"
-             target="_blank"
-             rel="noopener"
-             class="d-inline-flex align-items-center"
-             aria-label="WhatsApp">
-            <i class="bi bi-whatsapp me-1"></i>
             <span>MGCLS-HI Team</span>
           </a>
         </div>
@@ -623,7 +648,7 @@
 
     <div class="d-flex flex-wrap justify-content-between align-items-center small">
       <div>
-        © {{ current_year or 2025 }} MGCLS-HI First Data Release is a product of
+        © {{ CURRENT_YEAR }} MGCLS-HI First Data Release is a product of
         Rhodes University and the National Research Foundation – South African
         Radio Astronomy Observatory (NRF–SARAO).
       </div>

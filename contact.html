@@ -1,31 +1,50 @@
 {% extends "layout.html" %}
+{% block title %}Contact · MGCLS–H I{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Contact Us</h2>
+<div class="container my-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-9">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h1 class="text-center mb-3">Contact Us</h1>
+          <p class="text-muted text-center mb-4">
+            For all MGCLS–H I queries, please contact the project through the email addresses below.
+            This keeps data requests, website questions and collaboration enquiries in one place.
+          </p>
 
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="form-section">
-                <p class="text-muted">
-                    If you have any questions, suggestions, or feedback, please feel free to get in touch with the project team.
-                </p>
-
-                <ul class="list-unstyled">
-                    <li><strong>Project Lead:</strong> <a href="mailto:knowles.kenda@gmail.com">Dr. Kenda Knowles</a></li>
-                    <li><strong>Institution:</strong> Rhodes University / SARAO</li>
-                    <li><strong>Project:</strong> HI-MGCLS - Galaxy Cluster Explorer</li>
-                    <li><strong>Data Access Help:</strong> <a href="mailto:hi-mgcls-support@ska.ac.za">hi-mgcls-support@ska.ac.za</a></li>
-                </ul>
-
-                <p class="mt-4">
-                    For technical issues related to the website or the data visualisation tools, please contact the web administrator via the support email above.
-                </p>
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-md-6">
+              <div class="border rounded p-3 h-100">
+                <h5 class="mb-2">RATT Admin</h5>
+                <p class="mb-3 text-muted small">For administrative support, general website issues and routing to the right person.</p>
+                <a class="btn btn-outline-primary w-100" href="mailto:admin@ratt.center?subject=MGCLS-HI%20Admin%20Support">admin@ratt.center</a>
+              </div>
             </div>
-        </div>
-    </div>
 
-    <p class="mt-4 text-center">
-        <a href="{{ url_for('index') }}">← Back to Home</a>
-    </p>
+            <div class="col-12 col-md-6">
+              <div class="border rounded p-3 h-100">
+                <h5 class="mb-2">MGCLS-HI Team</h5>
+                <p class="mb-3 text-muted small">For data access, scientific queries, catalogue questions, downloads and collaboration requests.</p>
+                <a class="btn btn-warning w-100" href="mailto:kmophahlane@gmail.com,jamesdastro@gmail.com,m.ramatsoku@ru.ac.za,kamau757@gmail.com?subject=MGCLS-HI%20Database%20Query">Email the MGCLS-HI Team</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-light border mb-4">
+            <div class="fw-semibold mb-2">Before you email</div>
+            <div class="small text-muted">
+              Please include the cluster name, galaxy name or ID, and a short description of the issue or request.
+              This helps the team respond faster and route technical queries correctly.
+            </div>
+          </div>
+
+          <p class="mb-0 text-center">
+            <a href="{{ url_for('index') }}">← Back to Home</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

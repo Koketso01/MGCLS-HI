@@ -1,0 +1,330 @@
+{% extends "layout.html" %}
+{% block title %}Select download products · MGCLS–H I{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <h2 class="mb-1">{{ entity_title }}</h2>
+      <p class="text-muted mb-0">{{ subtitle }}</p>
+    </div>
+    <a class="btn btn-outline-secondary" href="{{ back_href }}">← {{ back_label }}</a>
+  </div>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div>
+          <h5 class="mb-1">Choose products</h5>
+          <div class="text-muted small">Tick the products you want to download from the terminal.</div>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="setAllProducts(true)">Select all</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setAllProducts(false)">Clear all</button>
+        </div>
+      </div>
+
+      <form id="productSelectionForm" onsubmit="return false;">
+        {% for group in groups %}
+          {% set group_idx = loop.index0 %}
+          <div class="border rounded p-3 mb-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+              <div>
+                <h6 class="mb-1">{{ group.title }}</h6>
+                <div class="text-muted small">{{ group.help }}</div>
+              </div>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="toggleGroup('{{ loop.index0 }}', true)">Select group</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleGroup('{{ loop.index0 }}', false)">Clear group</button>
+              </div>
+            </div>
+
+            <div class="row g-2">
+              {% for item in group["items"] %}
+                <div class="col-12 col-md-6">
+                  <label class="form-check border rounded p-3 h-100 d-flex gap-2 align-items-start download-option">
+                    <input class="form-check-input mt-1 product-checkbox group-{{ group_idx }}" type="checkbox" value="{{ item.key }}" {% if item.key in default_checked %}checked{% endif %}>
+                    <span>
+                      <span class="fw-semibold d-block">{{ item.label }}</span>
+                      <code class="small">{{ item.key }}</code>
+                    </span>
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </form>
+    </div>
+  </div>
+
+  <div class="card shadow-sm terminal-console-card" id="cli-workflows">
+    <div class="card-body">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div>
+          <h5 class="mb-1">Terminal / CLI workflow</h5>
+          <div class="text-muted small">Commands update automatically as you tick or untick products above.</div>
+        </div>
+        <span class="badge text-bg-dark px-3 py-2" id="selectedCountBadge">0 products selected</span>
+      </div>
+
+      <div class="quick-guide mb-4">
+        <div class="quick-guide-title">Quick start</div>
+        <ol class="mb-0 small">
+          <li>Tick the products you want.</li>
+          <li>Copy either the <code>wget</code> or <code>curl</code> command.</li>
+          <li>Paste into your terminal and watch the live progress bar there.</li>
+        </ol>
+      </div>
+
+      <div class="alert alert-light border small mb-3">
+        {% for group in groups %}
+          <div class="mt-2">
+            <span class="fw-semibold">{{ group.title }}:</span>
+            {% for item in group["items"] %}
+              <code>{{ item.key }}</code>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="mb-4">
+        <div class="fw-semibold mb-2">Currently selected product keys</div>
+        <div id="selectedProductsList" class="selected-products-panel small text-muted">None selected yet.</div>
+      </div>
+
+      <div class="command-grid">
+        <div class="command-card">
+          <div class="command-header">
+            <span>wget — selected products</span>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="copyCommand('wgetSelectedCmd', this)">Copy</button>
+          </div>
+          <textarea id="wgetSelectedCmd" class="form-control font-monospace small command-box" rows="4" readonly></textarea>
+          <div class="form-text">Downloads a small shell script, then runs the download in your terminal with a live progress meter.</div>
+        </div>
+
+        <div class="command-card">
+          <div class="command-header">
+            <span>curl — selected products</span>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="copyCommand('curlSelectedCmd', this)">Copy</button>
+          </div>
+          <textarea id="curlSelectedCmd" class="form-control font-monospace small command-box" rows="4" readonly></textarea>
+          <div class="form-text">Downloads a small shell script, then runs the download in your terminal with curl resume support.</div>
+        </div>
+
+        <div class="command-card">
+          <div class="command-header">
+            <span>wget — everything</span>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="copyCommand('wgetAllCmd', this)">Copy</button>
+          </div>
+          <textarea id="wgetAllCmd" class="form-control font-monospace small command-box" rows="3" readonly></textarea>
+        </div>
+
+        <div class="command-card">
+          <div class="command-header">
+            <span>curl — everything</span>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="copyCommand('curlAllCmd', this)">Copy</button>
+          </div>
+          <textarea id="curlAllCmd" class="form-control font-monospace small command-box" rows="3" readonly></textarea>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  .quick-guide {
+    border: 1px solid rgba(0,0,0,.08);
+    background: #f8f9fa;
+    border-radius: .75rem;
+    padding: 1rem 1rem .9rem;
+  }
+  .quick-guide-title {
+    font-weight: 700;
+    margin-bottom: .5rem;
+  }
+  .selected-products-panel {
+    border: 1px dashed rgba(0,0,0,.15);
+    background: #fafbfc;
+    border-radius: .75rem;
+    padding: .85rem 1rem;
+    min-height: 3.25rem;
+  }
+  .command-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  @media (min-width: 992px) {
+    .command-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .command-card {
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: .85rem;
+    padding: 1rem;
+    background: #ffffff;
+  }
+  .command-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    font-weight: 700;
+    margin-bottom: .7rem;
+  }
+  .command-header .btn {
+    min-width: 6.6rem;
+  }
+  .command-box {
+    background: #0d1117;
+    color: #d1f7e6;
+    border-color: #1f2937;
+  }
+  .command-box:focus {
+    background: #0d1117;
+    color: #d1f7e6;
+  }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function getSelectedProducts() {
+    return Array.from(document.querySelectorAll('.product-checkbox:checked')).map(cb => cb.value);
+  }
+
+  function buildSelectedUrl() {
+    const baseUrl = {{ action_url_abs|tojson }};
+    const selected = getSelectedProducts();
+    if (selected.length === 0) return "";
+
+    const params = new URLSearchParams();
+    params.set("mode", "selected");
+    params.set("format", "script");
+    selected.forEach(p => params.append("products", p));
+    return `${baseUrl}?${params.toString()}`;
+  }
+
+  function buildAllUrl() {
+    const baseUrl = {{ action_url_abs|tojson }};
+    const params = new URLSearchParams();
+    params.set("mode", "all");
+    params.set("format", "script");
+    return `${baseUrl}?${params.toString()}`;
+  }
+
+  function renderSelectedProducts(selected) {
+    const selectedList = document.getElementById("selectedProductsList");
+    const badge = document.getElementById("selectedCountBadge");
+
+    if (!selected.length) {
+      selectedList.textContent = "None selected yet.";
+      badge.textContent = "0 products selected";
+      return;
+    }
+
+    selectedList.innerHTML = selected.map(p => `<code>${p}</code>`).join(", ");
+    badge.textContent = `${selected.length} product${selected.length === 1 ? '' : 's'} selected`;
+  }
+
+  function updateCliCommands() {
+    const selected = getSelectedProducts();
+    const wgetSelected = document.getElementById("wgetSelectedCmd");
+    const curlSelected = document.getElementById("curlSelectedCmd");
+    const wgetAll = document.getElementById("wgetAllCmd");
+    const curlAll = document.getElementById("curlAllCmd");
+
+    const selectedOut = {{ (entity_title|replace(' ', '_') ~ '_selected_products_download.sh')|tojson }};
+    const allOut = {{ (filename|replace('.zip', '_download.sh'))|tojson }};
+
+    renderSelectedProducts(selected);
+
+    if (!selected.length) {
+      wgetSelected.value = "# Select at least one product above";
+      curlSelected.value = "# Select at least one product above";
+    } else {
+      const selectedUrl = buildSelectedUrl();
+      wgetSelected.value = `wget -O "${selectedOut}" "${selectedUrl}" && bash "${selectedOut}"`;
+      curlSelected.value = `curl -L "${selectedUrl}" -o "${selectedOut}" && bash "${selectedOut}"`;
+    }
+
+    const allUrl = buildAllUrl();
+    wgetAll.value = `wget -O "${allOut}" "${allUrl}" && bash "${allOut}"`;
+    curlAll.value = `curl -L "${allUrl}" -o "${allOut}" && bash "${allOut}"`;
+  }
+
+  function setAllProducts(checked) {
+    document.querySelectorAll('.product-checkbox').forEach(cb => {
+      cb.checked = checked;
+    });
+    updateCliCommands();
+  }
+
+  function toggleGroup(groupId, checked) {
+    document.querySelectorAll('.group-' + groupId).forEach(cb => {
+      cb.checked = checked;
+    });
+    updateCliCommands();
+  }
+
+  function flashCopyButton(button, success = true) {
+    if (!button) return;
+
+    const originalHtml = button.dataset.originalHtml || button.innerHTML;
+    const originalClass = button.dataset.originalClass || button.className;
+
+    button.dataset.originalHtml = originalHtml;
+    button.dataset.originalClass = originalClass;
+    button.disabled = true;
+
+    if (success) {
+      button.classList.remove('btn-outline-secondary');
+      button.classList.add('btn-success');
+      button.innerHTML = '<i class="bi bi-check2"></i> Copied';
+    } else {
+      button.classList.remove('btn-outline-secondary');
+      button.classList.add('btn-danger');
+      button.innerHTML = '<i class="bi bi-x-lg"></i> Failed';
+    }
+
+    window.setTimeout(() => {
+      button.className = originalClass;
+      button.innerHTML = originalHtml;
+      button.disabled = false;
+    }, 1400);
+  }
+
+  async function copyCommand(elementId, button = null) {
+    const el = document.getElementById(elementId);
+    if (!el || !el.value) return;
+
+    let copied = false;
+
+    try {
+      await navigator.clipboard.writeText(el.value);
+      copied = true;
+    } catch (err) {
+      try {
+        el.focus();
+        el.select();
+        el.setSelectionRange(0, el.value.length);
+        copied = document.execCommand('copy');
+      } catch (_) {
+        copied = false;
+      }
+    }
+
+    flashCopyButton(button, copied);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('.product-checkbox').forEach(cb => {
+      cb.addEventListener("change", updateCliCommands);
+    });
+    updateCliCommands();
+  });
+</script>
+{% endblock %}
