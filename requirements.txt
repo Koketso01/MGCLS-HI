@@ -1,0 +1,5 @@
+Flask==2.2.5
+Werkzeug==2.2.3
+numpy==2.4.3
+pandas==3.0.1
+zappa==0.62.1

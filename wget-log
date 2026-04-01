@@ -1,0 +1,101 @@
+--2026-03-18 14:17:54--  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Resolving fl3p8htm34.execute-api.us-east-2.amazonaws.com (fl3p8htm34.execute-api.us-east-2.amazonaws.com)... 3.160.170.48, 3.160.170.85, 3.160.170.88, ...
+Connecting to fl3p8htm34.execute-api.us-east-2.amazonaws.com (fl3p8htm34.execute-api.us-east-2.amazonaws.com)|3.160.170.48|:443... connected.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:18:25--  (try: 2)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:27:13--  (try: 3)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... Read error (Connection reset by peer) in headers.
+Retrying.
+
+--2026-03-18 14:27:16--  (try: 4)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Connecting to fl3p8htm34.execute-api.us-east-2.amazonaws.com (fl3p8htm34.execute-api.us-east-2.amazonaws.com)|3.160.170.48|:443... connected.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:27:49--  (try: 5)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:28:23--  (try: 6)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:28:59--  (try: 7)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:29:36--  (try: 8)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:30:13--  (try: 9)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:30:51--  (try:10)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:31:31--  (try:11)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:32:11--  (try:12)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:32:51--  (try:13)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:33:30--  (try:14)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:34:10--  (try:15)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:34:50--  (try:16)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:35:29--  (try:17)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:36:09--  (try:18)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:36:49--  (try:19)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Retrying.
+
+--2026-03-18 14:37:29--  (try:20)  https://fl3p8htm34.execute-api.us-east-2.amazonaws.com/dev/dev/download/cluster/Abell-194?mode=selected&products=cluster_cat&products=cluster_cube&products=cluster_mask&products=cluster_mask_raw&products=cluster_mom0&products=cluster_mom1&products=cluster_mom2
+Reusing existing connection to fl3p8htm34.execute-api.us-east-2.amazonaws.com:443.
+HTTP request sent, awaiting response... 504 Gateway Timeout
+Giving up.
+

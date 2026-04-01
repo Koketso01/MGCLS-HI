@@ -1,0 +1,2 @@
+-r requirements.txt
+zappa==0.62.1

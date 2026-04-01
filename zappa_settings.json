@@ -1,0 +1,43 @@
+{
+  "dev": {
+    "app_function": "app.app",
+    "aws_region": "us-east-2",
+    "profile_name": "mgcls",
+    "project_name": "mgcls-hi",
+    "runtime": "python3.11",
+    "s3_bucket": "zappa-mgcls-hi-26-03-05-13-24",
+    "binary_support": true,
+    "slim_handler": true,
+    "memory_size": 3008,
+    "timeout_seconds": 29,
+    "keep_warm": true,
+    "touch_path": "/health",
+    "use_precompiled_packages": true,
+    "layers": [
+      "arn:aws:lambda:us-east-2:800133935729:layer:flaskapps-numpy-pandas-py311-x86_64:2"
+    ],
+    "exclude": [
+      ".venv",
+      "python",
+      "layer.zip",
+      "build",
+      "dist",
+      ".zappa",
+      "__pycache__",
+      "*.pyc",
+      "*.pyo",
+      "*.egg-info",
+      ".git",
+      ".pytest_cache",
+      ".mypy_cache",
+      "node_modules",
+      "numpy",
+      "pandas",
+      "boto3",
+      "botocore",
+      "s3transfer",
+      "dateutil",
+      "tests"
+    ]
+  }
+}
